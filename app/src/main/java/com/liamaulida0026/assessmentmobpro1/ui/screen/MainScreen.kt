@@ -14,6 +14,7 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowDropDown
+import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material3.Button
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
@@ -67,6 +68,7 @@ fun MainScreen() {
 @Composable
 fun ScreenContent(modifier: Modifier = Modifier) {
     var inputAngka by remember { mutableStateOf(TextFieldValue()) }
+    var inputAngkaError by remember { mutableStateOf(false) }
 
     var selectedFromUnit by remember { mutableStateOf("Pilih satuan awal") }
     var selectedToUnit by remember { mutableStateOf("Pilih satuan tujuan") }
@@ -92,6 +94,9 @@ fun ScreenContent(modifier: Modifier = Modifier) {
             onValueChange = { inputAngka = it },
             label = { Text(stringResource(id = R.string.input_label)) },
             modifier = Modifier.fillMaxWidth(),
+            trailingIcon = { IconPicker(inputAngkaError, "") },
+            supportingText = { ErrorHint(inputAngkaError) },
+            isError = inputAngkaError,
             singleLine = true,
             keyboardOptions = KeyboardOptions(
                 keyboardType = KeyboardType.Number,
@@ -104,17 +109,26 @@ fun ScreenContent(modifier: Modifier = Modifier) {
 
         Button(
             onClick = {
-                if (
-                    inputAngka.text.isNotEmpty() &&
-                    selectedFromUnit != "Pilih satuan awal" &&
-                    selectedToUnit != "Pilih satuan tujuan"
+                inputAngkaError = (inputAngka.text.isEmpty() || inputAngka.text == "0")
 
-                ) {
-                    resultValue = convertWeight(inputAngka.text, selectedFromUnit, selectedToUnit)
-                    hasil = true
-                } else {
+                // Jika error input, nantinya akan langsung keluar
+                if (inputAngkaError) {
                     hasil = false
+                    return@Button
                 }
+
+                // Jika satuan belum dipilih, juga tidak tampilkan hasilnya
+                if (
+                    selectedFromUnit == "Pilih satuan awal" ||
+                    selectedToUnit == "Pilih satuan tujuan"
+                ) {
+                    hasil = false
+                    return@Button
+                }
+
+                // Jika semua valid, baru akan di hitung
+                resultValue = convertWeight(inputAngka.text, selectedFromUnit, selectedToUnit)
+                hasil = true
             },
             modifier = Modifier.padding(top = 8.dp),
             contentPadding = PaddingValues(horizontal = 32.dp, vertical = 16.dp)
@@ -170,6 +184,28 @@ fun DropdownSelector(label: String, selectedOption: String, onOptionSelected: (S
                 )
             }
         }
+    }
+}
+
+@Composable
+fun ErrorHint(isError: Boolean) {
+    if (isError)
+        Text(
+            text = stringResource(id = R.string.invalid_input),
+            color = MaterialTheme.colorScheme.error
+        )
+}
+
+@Composable
+fun IconPicker(isError: Boolean, unit: String) {
+    if (isError) {
+        Icon(
+            imageVector = Icons.Filled.Warning,
+            contentDescription = null,
+            tint = MaterialTheme.colorScheme.error
+        )
+    } else {
+        Text(text = unit)
     }
 }
 
