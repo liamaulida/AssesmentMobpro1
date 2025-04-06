@@ -167,7 +167,7 @@ fun ScreenContent(modifier: Modifier = Modifier) {
                 onClick = {
                     shareData(
                         context = context,
-                        message = context.getString(R.string.bagikan_template, resultValue, selectedFromUnit, selectedToUnit)
+                        message = context.getString(R.string.bagikan_template, inputAngka, selectedFromUnit, selectedToUnit, resultValue)
                     )
                 },
                 modifier = Modifier.padding(top = 8.dp),

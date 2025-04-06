@@ -16,5 +16,5 @@
         untuk Perangkat Bergerak 1.\n\nCopyright © 2024-2025 Lia Maulida As Sa\'adah. \nAll rights reserved.</string>
     <string name="kembali">Kembali</string>
     <string name="bagikan">Bagikan</string>
-    <string name="bagikan_template">Saya menggunakan aplikasi GroceryScale untuk mengonversi satuan berat.\nHasil konversi: %1$.4f dari satuan %2$s ke satuan %3$s.</string>
+    <string name="bagikan_template">Berikut hasil konversi saya : \n Satuan awal: %1$s\n Satuan tujuan: %2$s\n Nilai awal: %3$s\n Hasil konversi: %4$.4f </string>
 </resources>
