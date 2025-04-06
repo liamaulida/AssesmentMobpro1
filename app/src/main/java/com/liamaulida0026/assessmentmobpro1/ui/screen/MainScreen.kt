@@ -18,6 +18,7 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -28,6 +29,7 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -69,6 +71,9 @@ fun ScreenContent(modifier: Modifier = Modifier) {
     var selectedFromUnit by remember { mutableStateOf("Pilih satuan awal") }
     var selectedToUnit by remember { mutableStateOf("Pilih satuan tujuan") }
 
+    var hasil by remember { mutableStateOf(false) }
+    var resultValue by remember { mutableFloatStateOf(0f) }
+
     Column(
         modifier = modifier
             .fillMaxSize()
@@ -98,15 +103,36 @@ fun ScreenContent(modifier: Modifier = Modifier) {
         DropdownSelector(stringResource(id = R.string.ke_satuan), selectedToUnit) { selectedToUnit = it }
 
         Button(
-            onClick = {},
+            onClick = {
+                if (
+                    inputAngka.text.isNotEmpty() &&
+                    selectedFromUnit != "Pilih satuan awal" &&
+                    selectedToUnit != "Pilih satuan tujuan"
+
+                ) {
+                    resultValue = convertWeight(inputAngka.text, selectedFromUnit, selectedToUnit)
+                    hasil = true
+                } else {
+                    hasil = false
+                }
+            },
             modifier = Modifier.padding(top = 8.dp),
             contentPadding = PaddingValues(horizontal = 32.dp, vertical = 16.dp)
         ) {
             Text(text = stringResource(R.string.hasil))
         }
+
+        if (hasil) {
+            HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
+
+            Text(
+                text = stringResource(R.string.hasil_x, resultValue),
+                style = MaterialTheme.typography.headlineLarge
+            )
+        }
+
     }
 }
-
 
 @Composable
 fun DropdownSelector(label: String, selectedOption: String, onOptionSelected: (String) -> Unit) {
@@ -144,6 +170,46 @@ fun DropdownSelector(label: String, selectedOption: String, onOptionSelected: (S
                 )
             }
         }
+    }
+}
+
+fun convertWeight(value: String, fromUnit: String, toUnit: String): Float {
+    if (value.isEmpty() || value == "0" || value.toFloatOrNull() == null) {
+        return 0f
+    }
+
+    val inputValue = value.toFloat()
+
+    return when (fromUnit) {
+        "Gram" -> when (toUnit) {
+            "Gram" -> inputValue
+            "Kilogram" -> inputValue / 1000
+            "Ons" -> inputValue / 28.3495f
+            "Pound" -> inputValue * 0.00220462f
+            else -> 0f
+        }
+        "Kilogram" -> when (toUnit) {
+            "Gram" -> inputValue * 1000
+            "Kilogram" -> inputValue
+            "Ons" -> inputValue * 35.274f
+            "Pound" -> inputValue * 2.20462f
+            else -> 0f
+        }
+        "Ons" -> when (toUnit) {
+            "Gram" -> inputValue * 28.3495f
+            "Kilogram" -> inputValue / 35.274f
+            "Ons" -> inputValue
+            "Pound" -> inputValue * 0.220462f
+            else -> 0f
+        }
+        "Pound" -> when (toUnit) {
+            "Gram" -> inputValue * 453.592f
+            "Kilogram" -> inputValue * 0.453592f
+            "Ons" -> inputValue * 16f
+            "Pound" -> inputValue
+            else -> 0f
+        }
+        else -> 0f
     }
 }
 
