@@ -1,15 +1,25 @@
 package com.liamaulida0026.assessmentmobpro1.ui.screen
 
 import android.content.res.Configuration
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowDropDown
+import androidx.compose.material3.Button
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
@@ -56,6 +66,9 @@ fun MainScreen() {
 fun ScreenContent(modifier: Modifier = Modifier) {
     var inputAngka by remember { mutableStateOf(TextFieldValue()) }
 
+    var selectedFromUnit by remember { mutableStateOf("Pilih satuan awal") }
+    var selectedToUnit by remember { mutableStateOf("Pilih satuan tujuan") }
+
     Column(
         modifier = modifier
             .fillMaxSize()
@@ -80,6 +93,57 @@ fun ScreenContent(modifier: Modifier = Modifier) {
                 imeAction = ImeAction.Next
             ),
         )
+
+        DropdownSelector(stringResource(id = R.string.dari_satuan), selectedFromUnit) { selectedFromUnit = it }
+        DropdownSelector(stringResource(id = R.string.ke_satuan), selectedToUnit) { selectedToUnit = it }
+
+        Button(
+            onClick = {},
+            modifier = Modifier.padding(top = 8.dp),
+            contentPadding = PaddingValues(horizontal = 32.dp, vertical = 16.dp)
+        ) {
+            Text(text = stringResource(R.string.hasil))
+        }
+    }
+}
+
+
+@Composable
+fun DropdownSelector(label: String, selectedOption: String, onOptionSelected: (String) -> Unit) {
+    var expanded by remember { mutableStateOf(false) }
+    val options = listOf("Gram", "Kilogram", "Ons", "Pound")
+
+    Box(modifier = Modifier.fillMaxWidth()) {
+        OutlinedTextField(
+            value = selectedOption,
+            onValueChange = {},
+            readOnly = true,
+            label = { Text(label) },
+            modifier = Modifier
+                .fillMaxWidth()
+                .clickable { expanded = true },
+            trailingIcon = {
+                IconButton(onClick = { expanded = !expanded }) {
+                    Icon(Icons.Default.ArrowDropDown, contentDescription = "Dropdown Icon")
+                }
+            }
+        )
+
+        DropdownMenu(
+            expanded = expanded,
+            onDismissRequest = { expanded = false },
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            options.forEach { option ->
+                DropdownMenuItem(
+                    text = { Text(option) },
+                    onClick = {
+                        onOptionSelected(option)
+                        expanded = false
+                    }
+                )
+            }
+        }
     }
 }
 

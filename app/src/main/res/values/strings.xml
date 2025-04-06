@@ -4,4 +4,7 @@
         digunakan untuk menyatakan massa atau berat suatu benda.
         Cobalah untuk mengkonversi satuan berat sekarang!</string>
     <string name="input_label">Masukkan Angka</string>
+    <string name="dari_satuan">Dari Satuan</string>
+    <string name="ke_satuan">Ke Satuan</string>
+    <string name="hasil">Hasil</string>
 </resources>
