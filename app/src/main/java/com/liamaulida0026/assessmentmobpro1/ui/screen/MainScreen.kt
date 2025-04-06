@@ -34,6 +34,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -82,7 +83,7 @@ fun MainScreen(navController: NavHostController) {
 
 @Composable
 fun ScreenContent(modifier: Modifier = Modifier) {
-    var inputAngka by remember { mutableStateOf(TextFieldValue()) }
+    var inputAngka by remember { mutableStateOf("0") }
     var inputAngkaError by remember { mutableStateOf(false) }
 
     var selectedFromUnit by remember { mutableStateOf("Pilih satuan awal") }
@@ -124,7 +125,7 @@ fun ScreenContent(modifier: Modifier = Modifier) {
 
         Button(
             onClick = {
-                inputAngkaError = (inputAngka.text.isEmpty() || inputAngka.text == "0")
+                inputAngkaError = (inputAngka.isEmpty() || inputAngka == "0")
 
                 // Jika error input, nantinya akan langsung keluar
                 if (inputAngkaError) {
@@ -142,7 +143,7 @@ fun ScreenContent(modifier: Modifier = Modifier) {
                 }
 
                 // Jika semua valid, baru akan di hitung
-                resultValue = convertWeight(inputAngka.text, selectedFromUnit, selectedToUnit)
+                resultValue = convertWeight(inputAngka, selectedFromUnit, selectedToUnit)
                 hasil = true
             },
             modifier = Modifier.padding(top = 8.dp),
