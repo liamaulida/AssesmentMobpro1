@@ -252,7 +252,7 @@ fun convertWeight(value: String, fromUnit: String, toUnit: String): Float {
 @Preview(showBackground = true)
 @Preview(uiMode = Configuration.UI_MODE_NIGHT_YES, showBackground = true)
 @Composable
-fun GreetingPreview() {
+fun MainScreenPreview() {
     AssessmentMobpro1Theme {
         MainScreen()
     }
