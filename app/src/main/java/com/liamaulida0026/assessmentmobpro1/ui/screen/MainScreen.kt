@@ -41,7 +41,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
@@ -83,14 +82,14 @@ fun MainScreen(navController: NavHostController) {
 
 @Composable
 fun ScreenContent(modifier: Modifier = Modifier) {
-    var inputAngka by remember { mutableStateOf("0") }
-    var inputAngkaError by remember { mutableStateOf(false) }
+    var inputAngka by rememberSaveable { mutableStateOf("0") }
+    var inputAngkaError by rememberSaveable { mutableStateOf(false) }
 
-    var selectedFromUnit by remember { mutableStateOf("Pilih satuan awal") }
-    var selectedToUnit by remember { mutableStateOf("Pilih satuan tujuan") }
+    var selectedFromUnit by rememberSaveable { mutableStateOf("Pilih satuan awal") }
+    var selectedToUnit by rememberSaveable { mutableStateOf("Pilih satuan tujuan") }
 
-    var hasil by remember { mutableStateOf(false) }
-    var resultValue by remember { mutableFloatStateOf(0f) }
+    var hasil by rememberSaveable { mutableStateOf(false) }
+    var resultValue by rememberSaveable { mutableFloatStateOf(0f) }
 
     Column(
         modifier = modifier
