@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Assessment Mobpro 1</string>
+    <string name="app_name">GroceryScale</string>
     <string name="intro_aplikasi">Satuan berat adalah ukuran yang
         digunakan untuk menyatakan massa atau berat suatu benda.
         Cobalah untuk mengkonversi satuan berat sekarang!</string>
@@ -15,4 +15,6 @@
         mudah sesuai kebutuhan.\n\Aplikasi ini dibuat untuk memenuhi penilaian mata kuliah Pemrograman
         untuk Perangkat Bergerak 1.\n\nCopyright © 2024-2025 Lia Maulida As Sa\'adah. \nAll rights reserved.</string>
     <string name="kembali">Kembali</string>
+    <string name="bagikan">Bagikan</string>
+    <string name="bagikan_template">Saya menggunakan aplikasi GroceryScale untuk mengonversi satuan berat.\nHasil konversi: %1$.4f dari satuan %2$s ke satuan %3$s.</string>
 </resources>

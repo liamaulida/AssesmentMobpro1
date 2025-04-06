@@ -1,5 +1,7 @@
 package com.liamaulida0026.assessmentmobpro1.ui.screen
 
+import android.content.Context
+import android.content.Intent
 import android.content.res.Configuration
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -38,6 +40,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
@@ -82,7 +85,7 @@ fun MainScreen(navController: NavHostController) {
 
 @Composable
 fun ScreenContent(modifier: Modifier = Modifier) {
-    var inputAngka by rememberSaveable { mutableStateOf("0") }
+    var inputAngka by rememberSaveable { mutableStateOf("") }
     var inputAngkaError by rememberSaveable { mutableStateOf(false) }
 
     var selectedFromUnit by rememberSaveable { mutableStateOf("Pilih satuan awal") }
@@ -90,6 +93,8 @@ fun ScreenContent(modifier: Modifier = Modifier) {
 
     var hasil by rememberSaveable { mutableStateOf(false) }
     var resultValue by rememberSaveable { mutableFloatStateOf(0f) }
+
+    val context = LocalContext.current
 
     Column(
         modifier = modifier
@@ -158,6 +163,18 @@ fun ScreenContent(modifier: Modifier = Modifier) {
                 text = stringResource(R.string.hasil_x, resultValue),
                 style = MaterialTheme.typography.headlineLarge
             )
+            Button(
+                onClick = {
+                    shareData(
+                        context = context,
+                        message = context.getString(R.string.bagikan_template, resultValue, selectedFromUnit, selectedToUnit)
+                    )
+                },
+                modifier = Modifier.padding(top = 8.dp),
+                contentPadding = PaddingValues(horizontal = 32.dp, vertical = 16.dp)
+            ) {
+                Text(text = stringResource(R.string.bagikan))
+            }
         }
 
     }
@@ -261,6 +278,17 @@ fun convertWeight(value: String, fromUnit: String, toUnit: String): Float {
             else -> 0f
         }
         else -> 0f
+    }
+}
+
+private fun shareData(context: Context, message: String) {
+    val shareIntent = Intent(Intent.ACTION_SEND).apply {
+        type = "text/plain"
+        putExtra(Intent.EXTRA_TEXT, message)
+    }
+
+    if (shareIntent.resolveActivity(context.packageManager) != null) {
+        context.startActivity(shareIntent)
     }
 }
 
