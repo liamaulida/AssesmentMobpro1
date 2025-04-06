@@ -1,3 +1,7 @@
 <resources>
     <string name="app_name">Assessment Mobpro 1</string>
+    <string name="intro_aplikasi">Satuan berat adalah ukuran yang
+        digunakan untuk menyatakan massa atau berat suatu benda.
+        Cobalah untuk mengkonversi satuan berat sekarang!</string>
+    <string name="input_label">Masukkan Angka</string>
 </resources>
