@@ -3,6 +3,7 @@ package com.liamaulida0026.assessmentmobpro1.ui.screen
 import android.content.Context
 import android.content.Intent
 import android.content.res.Configuration
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -11,6 +12,7 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
@@ -41,6 +43,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
@@ -49,6 +52,7 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.liamaulida0026.assessmentmobpro1.R
+import com.liamaulida0026.assessmentmobpro1.model.Logo
 import com.liamaulida0026.assessmentmobpro1.navigation.Screen
 import com.liamaulida0026.assessmentmobpro1.ui.theme.AssessmentMobpro1Theme
 
@@ -96,6 +100,11 @@ fun ScreenContent(modifier: Modifier = Modifier) {
 
     val context = LocalContext.current
 
+    val data = Logo(
+        nama = "Logo Aplikasi",
+        imageResId = R.drawable.logo
+    )
+
     Column(
         modifier = modifier
             .fillMaxSize()
@@ -104,6 +113,7 @@ fun ScreenContent(modifier: Modifier = Modifier) {
         verticalArrangement = Arrangement.spacedBy(12.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
+
         Text(
             text = stringResource(id = R.string.intro_aplikasi),
             style = MaterialTheme.typography.bodyMedium
