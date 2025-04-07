@@ -114,6 +114,15 @@ fun ScreenContent(modifier: Modifier = Modifier) {
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
 
+        Image(
+            painter = painterResource(id = data.imageResId),
+            contentDescription = stringResource(R.string.gambar_logo),
+            modifier = Modifier
+                .fillMaxWidth(0.3f)
+                .padding(vertical = 16.dp)
+                .align(Alignment.CenterHorizontally)
+        )
+
         Text(
             text = stringResource(id = R.string.intro_aplikasi),
             style = MaterialTheme.typography.bodyMedium
