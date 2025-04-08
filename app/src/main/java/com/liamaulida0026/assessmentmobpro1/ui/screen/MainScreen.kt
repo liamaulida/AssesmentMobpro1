@@ -108,8 +108,8 @@ fun ScreenContent(modifier: Modifier = Modifier) {
     var inputAngka by rememberSaveable { mutableStateOf("") }
     var inputAngkaError by rememberSaveable { mutableStateOf(false) }
 
-    var selectedFromUnit by rememberSaveable { mutableStateOf("Pilih satuan awal") }
-    var selectedToUnit by rememberSaveable { mutableStateOf("Pilih satuan tujuan") }
+    var selectedFromUnit by rememberSaveable { mutableStateOf("") }
+    var selectedToUnit by rememberSaveable { mutableStateOf("") }
 
     var hasil by rememberSaveable { mutableStateOf(false) }
     var resultValue by rememberSaveable { mutableFloatStateOf(0f) }
