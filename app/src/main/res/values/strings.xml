@@ -18,4 +18,10 @@
     <string name="bagikan">Bagikan</string>
     <string name="bagikan_template">Berikut hasil konversi saya : \n Satuan awal: %1$s\n Satuan tujuan: %2$s\n Nilai awal: %3$s\n Hasil konversi: %4$.4f </string>
     <string name="gambar_logo">Logo Aplikasi</string>
+    <string name="bantuan">Bantuan</string>
+    <string name="isi_bantuan">Berikut tata cara penggunaan aplikasi GroceryScale : \n\n
+    1. Masukkan angka yang ingin kamu konversi pada kolom input yang telah disediakan. Pastikan angka yang dimasukkan sesuai dengan satuan berat yang ingin dikonversi.\n
+    2. Pilih satuan awal dari angka yang kamu masukkan, lalu pilih juga satuan tujuan yang ingin kamu ubah agar hasil konversinya sesuai dengan kebutuhanmu.\n
+    3. Lalu klik tombol Hasil untuk menampilkan hasil konversi berdasarkan input dan pilihan satuanmu.\n
+    4. Jika kamu ingin membagikan hasil konversi, klik tombol Bagikan untuk membagikan hasil konversi melalui aplikasi lain.</string>
 </resources>
