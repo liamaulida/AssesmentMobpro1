@@ -12,7 +12,7 @@
     <string name="tentang_aplikasi">Tentang Aplikasi</string>
     <string name="copyright">Aplikasi GroceryScale merupakan aplikasi sederhana yang membantu pengguna
         mengonversi satuan berat bahan makanan seperti gram, kilogram, ons, dan pound dengan cepat dan
-        mudah sesuai kebutuhan.\n\Aplikasi ini dibuat untuk memenuhi penilaian mata kuliah Pemrograman
+        mudah sesuai kebutuhan.\n\n\Aplikasi ini dibuat untuk memenuhi penilaian mata kuliah Pemrograman
         untuk Perangkat Bergerak 1.\n\nCopyright © 2024-2025 Lia Maulida As Sa\'adah. \nAll rights reserved.</string>
     <string name="kembali">Kembali</string>
     <string name="bagikan">Bagikan</string>
@@ -24,4 +24,5 @@
     2. Pilih satuan awal dari angka yang kamu masukkan, lalu pilih juga satuan tujuan yang ingin kamu ubah agar hasil konversinya sesuai dengan kebutuhanmu.\n
     3. Lalu klik tombol Hasil untuk menampilkan hasil konversi berdasarkan input dan pilihan satuanmu.\n
     4. Jika kamu ingin membagikan hasil konversi, klik tombol Bagikan untuk membagikan hasil konversi melalui aplikasi lain.</string>
+    <string name="menu">Menu</string>
 </resources>
