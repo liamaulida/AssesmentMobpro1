@@ -218,7 +218,12 @@ fun ScreenContent(modifier: Modifier = Modifier) {
 @Composable
 fun DropdownSelector(label: String, selectedOption: String, onOptionSelected: (String) -> Unit) {
     var expanded by remember { mutableStateOf(false) }
-    val options = listOf("Gram", "Kilogram", "Ons", "Pound")
+    val options = listOf(
+        stringResource(R.string.gram),
+        stringResource(R.string.kilogram),
+        stringResource(R.string.ons),
+        stringResource(R.string.pound)
+    )
 
     Box(modifier = Modifier.fillMaxWidth()) {
         OutlinedTextField(

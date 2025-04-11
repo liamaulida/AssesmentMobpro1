@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">GroceryScale</string>
+    <string name="intro_aplikasi">Satuan berat adalah ukuran yang digunakan untuk menyatakan massa atau berat suatu benda.
+        Cobalah untuk mengkonversi satuan berat sekarang!</string>
+    <string name="input_label">Masukkan Angka</string>
+    <string name="dari_satuan">Dari Satuan</string>
+    <string name="ke_satuan">Ke Satuan</string>
+    <string name="hasil">Hasil</string>
+    <string name="hasil_x">Hasil Konversi : %1$.4f</string>
+    <string name="invalid_input">Input tidak valid</string>
+    <string name="tentang_aplikasi">Tentang Aplikasi</string>
+    <string name="copyright">Aplikasi GroceryScale merupakan aplikasi sederhana yang dirancang untuk membantu pengguna dalam
+        mengonversi satuan berat bahan makanan seperti gram, kilogram, ons, dan pound dengan cepat dan mudah. Aplikasi ini cocok
+        digunakan saat berbelanja atau memasak, sehingga memudahkan pengguna menyesuaikan takaran sesuai kebutuhan.\n\n\Aplikasi
+        ini dibuat untuk memenuhi penilaian Assessment pada mata kuliah Pemrograman untuk Perangkat Bergerak 1. \n\nCopyright © 2024-2025
+        Lia Maulida As Sa\'adah. \nAll rights reserved.</string>
+    <string name="kembali">Kembali</string>
+    <string name="bagikan">Bagikan</string>
+    <string name="bagikan_template">Berikut hasil konversi saya : \n Satuan awal : %1$s\n Satuan tujuan : %2$s\n Nilai awal : %3$s\n Hasil konversi : %4$.4f</string>
+    <string name="gambar_logo">Logo Aplikasi</string>
+    <string name="bantuan">Bantuan</string>
+    <string name="isi_bantuan">Berikut tata cara penggunaan aplikasi GroceryScale : \n\n
+        1. Masukkan angka yang ingin kamu konversi pada kolom input yang telah disediakan. Pastikan angka yang dimasukkan sesuai dengan satuan berat yang ingin dikonversi.\n\n
+        2. Pilih satuan awal dari angka yang kamu masukkan, lalu pilih juga satuan tujuan yang ingin kamu ubah agar hasil konversinya sesuai dengan kebutuhanmu.\n\n
+        3. Lalu klik tombol Hasil untuk menampilkan hasil konversi berdasarkan input dan pilihan satuanmu.\n\n
+        4. Jika kamu ingin membagikan hasil konversi, klik tombol Bagikan untuk membagikan hasil konversi melalui aplikasi lain.</string>
+    <string name="menu">Menu</string>
+    <string name="gram">Gram</string>
+    <string name="kilogram">Kilogram</string>
+    <string name="ons">Ons</string>
+    <string name="pound">Pon</string>
+</resources>
