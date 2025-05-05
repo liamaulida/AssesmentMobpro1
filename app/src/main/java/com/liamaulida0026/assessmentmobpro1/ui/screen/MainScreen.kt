@@ -1,6 +1,7 @@
 package com.liamaulida0026.assessmentmobpro1.ui.screen
 
 import android.content.res.Configuration
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -66,13 +67,16 @@ fun MainScreen(navController: NavHostController) {
                 )
             }
         }
-    ) { padding ->
-        ScreenContent(Modifier.padding(padding))
+    ) { innerPadding ->
+        ScreenContent(Modifier.padding(innerPadding), navController)
     }
 }
 
 @Composable
-fun ScreenContent(modifier: Modifier = Modifier) {
+fun ScreenContent(
+    modifier: Modifier = Modifier,
+    navController: NavHostController
+) {
     val viewModel: MainViewModel = viewModel()
     val data = viewModel.data
 
@@ -93,7 +97,9 @@ fun ScreenContent(modifier: Modifier = Modifier) {
             contentPadding = PaddingValues(bottom = 84.dp)
         ) {
             items(data) {
-                ListItem(catatan = it)
+                ListItem(catatan = it) {
+                    navController.navigate(Screen.FormUbah.withId(it.id))
+                }
                 HorizontalDivider()
             }
         }
@@ -101,10 +107,11 @@ fun ScreenContent(modifier: Modifier = Modifier) {
 }
 
 @Composable
-fun ListItem(catatan: Catatan) {
+fun ListItem(catatan: Catatan, onClick: () -> Unit) {
     Column(
         modifier = Modifier
             .fillMaxWidth()
+            .clickable { onClick() }
             .padding(16.dp),
         verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
