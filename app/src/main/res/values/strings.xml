@@ -1,6 +1,14 @@
 <resources>
     <string name="app_name">Assessment Mobpro 1</string>
     <string name="list_kosong">Belum ada data</string>
-    <string name="tambah_catatan">Tambah list belanja</string>
+    <string name="tambah_catatan">Tambah List Belanja</string>
     <string name="belum_bisa">Belum bisa tambah list belanja</string>
+    <string name="judul">Nama barang</string>
+    <string name="sayur">Sayur</string>
+    <string name="buah">Buah</string>
+    <string name="daging">Daging</string>
+    <string name="lainnya">Lainnya</string>
+    <string name="satuan">Satuan</string>
+    <string name="berat">Berat</string>
+    <string name="kategori">Kategori</string>
 </resources>
