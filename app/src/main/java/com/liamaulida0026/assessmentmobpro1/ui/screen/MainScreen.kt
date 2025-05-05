@@ -1,7 +1,6 @@
 package com.liamaulida0026.assessmentmobpro1.ui.screen
 
 import android.content.res.Configuration
-import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -24,22 +23,23 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.rememberNavController
 import com.liamaulida0026.assessmentmobpro1.R
 import com.liamaulida0026.assessmentmobpro1.model.Catatan
+import com.liamaulida0026.assessmentmobpro1.navigation.Screen
 import com.liamaulida0026.assessmentmobpro1.ui.theme.AssessmentMobpro1Theme
 
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun MainScreen() {
-    val context = LocalContext.current
+fun MainScreen(navController: NavHostController) {
 
     Scaffold (
         topBar = {
@@ -56,7 +56,7 @@ fun MainScreen() {
         floatingActionButton = {
             FloatingActionButton(
                 onClick = {
-                    Toast.makeText(context, R.string.belum_bisa, Toast.LENGTH_SHORT).show()
+                   navController.navigate(Screen.FormBaru.route)
                 }
             ) {
                 Icon(
@@ -133,6 +133,6 @@ fun ListItem(catatan: Catatan) {
 @Composable
 fun MainScreenPreview() {
     AssessmentMobpro1Theme {
-        MainScreen()
+        MainScreen(rememberNavController())
     }
 }
