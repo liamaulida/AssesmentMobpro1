@@ -1,62 +1,21 @@
 package com.liamaulida0026.assessmentmobpro1.ui.screen
 
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import com.liamaulida0026.assessmentmobpro1.database.CatatanDao
 import com.liamaulida0026.assessmentmobpro1.model.Catatan
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.stateIn
 
-class MainViewModel : ViewModel() {
-    val data = listOf(
-        Catatan(
-            id = 1,
-            judul = "Pisang",
-            berat = 1.2,
-            satuan = "Kilogram",
-            kategori = "Buah"
-        ),
-        Catatan(
-            id = 2,
-            judul = "Wortel",
-            berat = 0.5,
-            satuan = "Kilogram",
-            kategori = "Sayur"
-        ),
-        Catatan(
-            id = 3,
-            judul = "Dada Ayam",
-            berat = 1.0,
-            satuan = "Kilogram",
-            kategori = "Daging"
-        ),
-        Catatan(
-            id = 4,
-            judul = "Beras",
-            berat = 2.0,
-            satuan = "Kilogram",
-            kategori = "Lainnya"
-        ),
-        Catatan(
-            id = 5,
-            judul = "Apel",
-            berat = 1.0,
-            satuan = "Kilogram",
-            kategori = "Buah"
-        ),
-        Catatan(
-            id = 6,
-            judul = "Bayam",
-            berat = 0.3,
-            satuan = "Kilogram",
-            kategori = "Sayur"
-        ),
-        Catatan(
-            id = 7,
-            judul = "Mie Kering",
-            berat = 2.0,
-            satuan = "Kilogram",
-            kategori = "Lainnya"
-        )
+class MainViewModel(dao: CatatanDao) : ViewModel() {
+
+    val data: StateFlow<List<Catatan>> = dao.getCatatan().stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.WhileSubscribed(),
+        initialValue = emptyList()
     )
-
     fun getCatatan(id: Long): Catatan? {
-        return data.find { it.id == id }
+        return data.value.find { it.id == id }
     }
 }

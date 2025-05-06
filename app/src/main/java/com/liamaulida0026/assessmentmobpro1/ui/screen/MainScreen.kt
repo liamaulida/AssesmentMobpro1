@@ -22,8 +22,11 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
@@ -36,6 +39,7 @@ import com.liamaulida0026.assessmentmobpro1.R
 import com.liamaulida0026.assessmentmobpro1.model.Catatan
 import com.liamaulida0026.assessmentmobpro1.navigation.Screen
 import com.liamaulida0026.assessmentmobpro1.ui.theme.AssessmentMobpro1Theme
+import com.liamaulida0026.assessmentmobpro1.util.ViewModelFactory
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -77,8 +81,10 @@ fun ScreenContent(
     modifier: Modifier = Modifier,
     navController: NavHostController
 ) {
-    val viewModel: MainViewModel = viewModel()
-    val data = viewModel.data
+    val context = LocalContext.current
+    val factory = ViewModelFactory(context)
+    val viewModel: MainViewModel = viewModel(factory = factory)
+    val data by viewModel.data.collectAsState()
 
     if (data.isEmpty()) {
         Column(
