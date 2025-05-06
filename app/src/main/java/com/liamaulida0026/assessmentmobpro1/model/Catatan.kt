@@ -1,6 +1,11 @@
 package com.liamaulida0026.assessmentmobpro1.model
 
+import androidx.room.Entity
+import androidx.room.PrimaryKey
+
+@Entity(tableName = "list")
 data class Catatan(
+    @PrimaryKey(autoGenerate = true)
     val id: Long,
     val judul: String,
     val berat: Double,
