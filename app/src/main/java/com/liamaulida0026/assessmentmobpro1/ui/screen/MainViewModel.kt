@@ -55,4 +55,8 @@ class MainViewModel : ViewModel() {
             kategori = "Lainnya"
         )
     )
+
+    fun getCatatan(id: Long): Catatan? {
+        return data.find { it.id == id }
+    }
 }
