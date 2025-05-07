@@ -16,4 +16,7 @@
     <string name="invalid">Isi daftar list belanja tidak boleh kosong</string>
     <string name="opsi_lainnya">Opsi Lainnya</string>
     <string name="hapus">Hapus Catatan</string>
+    <string name="pesan_hapus">Yakin hapus list belanja ini?</string>
+    <string name="tombol_hapus">Hapus</string>
+    <string name="tombol_batal">Batal</string>
 </resources>
