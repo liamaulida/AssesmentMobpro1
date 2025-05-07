@@ -16,6 +16,6 @@ interface CatatanDao {
     @Update
     suspend fun update(catatan: Catatan)
 
-    @Query("SELECT * FROM list ORDER BY judul ASC")
+    @Query("SELECT * FROM catatan ORDER BY judul ASC")
     fun getCatatan(): Flow<List<Catatan>>
 }
