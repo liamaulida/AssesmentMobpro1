@@ -112,9 +112,10 @@ fun DetailScreen(navController: NavHostController, id: Long? = null) {
                             Toast.makeText(context, R.string.invalid, Toast.LENGTH_LONG).show()
                             return@IconButton
                         }
-
                         if (id == null) {
                             viewModel.insert(judul, beratValue, satuan, kategori)
+                        } else {
+                            viewModel.update(id, judul, beratValue, satuan, kategori)
                         }
                         navController.popBackStack()
                     }){

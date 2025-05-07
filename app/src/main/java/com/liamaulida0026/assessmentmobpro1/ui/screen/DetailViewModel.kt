@@ -8,6 +8,11 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 class DetailViewModel(private val dao: CatatanDao) : ViewModel() {
+
+    suspend fun getCatatan(id: Long): Catatan? {
+        return dao.getCatatanById(id)
+    }
+
     fun insert(judul: String, berat: Double, satuan: String, kategori: String){
         val catatan = Catatan(
             judul = judul,
@@ -19,7 +24,18 @@ class DetailViewModel(private val dao: CatatanDao) : ViewModel() {
             dao.insert(catatan)
         }
     }
-    fun getCatatan(id: Long): Catatan? {
-        return null
+
+    fun update(id: Long, judul: String, berat: Double, satuan: String, kategori: String) {
+        val catatan = Catatan(
+            id = id,
+            judul = judul,
+            berat = berat,
+            satuan = satuan,
+            kategori = kategori
+        )
+
+        viewModelScope.launch(Dispatchers.IO) {
+            dao.update(catatan)
+        }
     }
 }

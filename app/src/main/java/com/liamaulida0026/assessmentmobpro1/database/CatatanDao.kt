@@ -18,4 +18,7 @@ interface CatatanDao {
 
     @Query("SELECT * FROM catatan ORDER BY judul ASC")
     fun getCatatan(): Flow<List<Catatan>>
+
+    @Query("SELECT * FROM catatan WHERE id = :id")
+    suspend fun getCatatanById(id: Long): Catatan?
 }
