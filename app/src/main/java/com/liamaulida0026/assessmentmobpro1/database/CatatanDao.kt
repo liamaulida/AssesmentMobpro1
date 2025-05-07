@@ -24,6 +24,4 @@ interface CatatanDao {
 
     @Query("DELETE FROM catatan WHERE id = :id")
     suspend fun deleteById(id: Long)
-
-
 }
