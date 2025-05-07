@@ -14,4 +14,6 @@
     <string name="simpan">Simpan</string>
     <string name="edit_catatan">Edit Catatan List Belanja</string>
     <string name="invalid">Isi daftar list belanja tidak boleh kosong</string>
+    <string name="opsi_lainnya">Opsi Lainnya</string>
+    <string name="hapus">Hapus Catatan</string>
 </resources>
