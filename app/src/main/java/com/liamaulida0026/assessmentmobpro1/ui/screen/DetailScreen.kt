@@ -131,7 +131,7 @@ fun DetailScreen(navController: NavHostController, id: Long? = null) {
                     }
                     if (id != null) {
                         DeleteAction {
-                           showDialog = true
+                            showDialog = true
                         }
                     }
                 }
@@ -246,7 +246,6 @@ fun FormCatatan(
             ),
             modifier = Modifier.fillMaxWidth()
         )
-
         // Membuat Berat dan Satuan dalam satu baris
         Row(
             horizontalArrangement = Arrangement.spacedBy(8.dp),
@@ -281,7 +280,6 @@ fun FormCatatan(
                         .menuAnchor()
                         .fillMaxWidth()
                 )
-
                 ExposedDropdownMenu(
                     expanded = expanded,
                     onDismissRequest = { onExpandedChange(false) }
@@ -322,7 +320,6 @@ fun FormCatatan(
                 )
             }
         }
-
     }
 }
 

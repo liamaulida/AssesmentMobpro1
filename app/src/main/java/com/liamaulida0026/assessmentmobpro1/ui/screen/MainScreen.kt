@@ -95,7 +95,7 @@ fun MainScreen(navController: NavHostController) {
         floatingActionButton = {
             FloatingActionButton(
                 onClick = {
-                   navController.navigate(Screen.FormBaru.route)
+                    navController.navigate(Screen.FormBaru.route)
                 }
             ) {
                 Icon(
@@ -142,11 +142,11 @@ fun ScreenContent(
                     ListItem(catatan = it) {
                         navController.navigate(Screen.FormUbah.withId(it.id))
                     }
-                        HorizontalDivider()
-                    }
-
+                    HorizontalDivider()
                 }
+
             }
+        }
         else {
             LazyVerticalStaggeredGrid(
                 modifier = modifier.fillMaxSize(),
@@ -179,17 +179,12 @@ fun ListItem(catatan: Catatan, onClick: () -> Unit) {
             maxLines = 1,
             overflow = TextOverflow.Ellipsis,
             fontWeight = FontWeight.Bold
-            )
+        )
         Text(
-            text = catatan.berat.toString(),
+            text = catatan.berat.toString() + " " + catatan.satuan,
             maxLines = 2,
             overflow = TextOverflow.Ellipsis
-            )
-        Text(
-            text = catatan.satuan,
-            maxLines = 1,
-            overflow = TextOverflow.Ellipsis
-            )
+        )
         Text(text = catatan.kategori)
     }
 }
@@ -214,13 +209,8 @@ fun GridItem(catatan: Catatan, onClick: () -> Unit) {
                 fontWeight = FontWeight.Bold
             )
             Text(
-                text = catatan.berat.toString(),
+                text = catatan.berat.toString() + " " + catatan.satuan,
                 maxLines = 2,
-                overflow = TextOverflow.Ellipsis
-            )
-            Text(
-                text = catatan.satuan,
-                maxLines = 1,
                 overflow = TextOverflow.Ellipsis
             )
             Text(text = catatan.kategori)
