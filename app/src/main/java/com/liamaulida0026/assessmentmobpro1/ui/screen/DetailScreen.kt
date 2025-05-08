@@ -4,6 +4,7 @@ import android.content.res.Configuration
 import android.widget.Toast
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
@@ -34,6 +35,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -51,6 +53,7 @@ import androidx.navigation.compose.rememberNavController
 import com.liamaulida0026.assessmentmobpro1.R
 import com.liamaulida0026.assessmentmobpro1.ui.theme.AssessmentMobpro1Theme
 import com.liamaulida0026.assessmentmobpro1.util.ViewModelFactory
+import kotlinx.coroutines.launch
 
 const val KEY_ID_CATATAN = "idCatatan"
 
@@ -73,12 +76,12 @@ fun DetailScreen(navController: NavHostController, id: Long? = null) {
         stringResource(id = R.string.lainnya)
     )
     var expanded by remember { mutableStateOf(false) }
-
     var kategori by remember { mutableStateOf(radioOptions[0]) }
-
     var showDialog by remember { mutableStateOf(false) }
 
-    LaunchedEffect(Unit) {
+    val coroutineScope = rememberCoroutineScope()
+
+    LaunchedEffect(id) {
         if (id == null) return@LaunchedEffect
         val data = viewModel.getCatatan(id) ?: return@LaunchedEffect
         judul = data.judul
@@ -87,7 +90,7 @@ fun DetailScreen(navController: NavHostController, id: Long? = null) {
         kategori = data.kategori
     }
 
-    Scaffold (
+    Scaffold(
         topBar = {
             TopAppBar(
                 navigationIcon = {
@@ -100,10 +103,11 @@ fun DetailScreen(navController: NavHostController, id: Long? = null) {
                     }
                 },
                 title = {
-                    if (id == null)
-                        Text(text = stringResource(id = R.string.tambah_catatan))
-                    else
-                        Text(text = stringResource(id = R.string.edit_catatan))
+                    Text(
+                        text = stringResource(
+                            if (id == null) R.string.tambah_catatan else R.string.edit_catatan
+                        )
+                    )
                 },
                 colors = TopAppBarDefaults.mediumTopAppBarColors(
                     containerColor = MaterialTheme.colorScheme.primaryContainer,
@@ -112,7 +116,7 @@ fun DetailScreen(navController: NavHostController, id: Long? = null) {
                 actions = {
                     IconButton(onClick = {
                         val beratValue = berat.toDoubleOrNull()
-                        if (judul == "" || beratValue == null || satuan == "") {
+                        if (judul.isBlank() || beratValue == null || satuan.isBlank()) {
                             Toast.makeText(context, R.string.invalid, Toast.LENGTH_LONG).show()
                             return@IconButton
                         }
@@ -122,7 +126,7 @@ fun DetailScreen(navController: NavHostController, id: Long? = null) {
                             viewModel.update(id, judul, beratValue, satuan, kategori)
                         }
                         navController.popBackStack()
-                    }){
+                    }) {
                         Icon(
                             imageVector = Icons.Outlined.Check,
                             contentDescription = stringResource(R.string.simpan),
@@ -156,11 +160,17 @@ fun DetailScreen(navController: NavHostController, id: Long? = null) {
 
         if (id != null && showDialog) {
             DisplayAlertDialog(
-                onDismissRequest = { showDialog = false }) {
-                showDialog = false
-                viewModel.delete(id)
-                navController.popBackStack()
-            }
+                onDismissRequest = { showDialog = false },
+                onConfirmation = {
+                    coroutineScope.launch {
+                        viewModel.getCatatan(id)?.let {
+                            viewModel.delete(it.id)
+                            navController.popBackStack()
+                        }
+                    }
+                    showDialog = false
+                }
+            )
         }
     }
 }
@@ -169,49 +179,26 @@ fun DetailScreen(navController: NavHostController, id: Long? = null) {
 fun DeleteAction(delete: () -> Unit) {
     var expanded by remember { mutableStateOf(false) }
 
-    IconButton(onClick = { expanded = true }) {
-        Icon(
-            imageVector = Icons.Filled.MoreVert,
-            contentDescription = stringResource(R.string.opsi_lainnya),
-            tint = MaterialTheme.colorScheme.primary
-        )
+    Box {
+        IconButton(onClick = { expanded = true }) {
+            Icon(
+                imageVector = Icons.Filled.MoreVert,
+                contentDescription = stringResource(R.string.opsi_lainnya),
+                tint = MaterialTheme.colorScheme.primary
+            )
+        }
         DropdownMenu(
             expanded = expanded,
             onDismissRequest = { expanded = false }
         ) {
             DropdownMenuItem(
-                text = {
-                    Text(text = stringResource(id = R.string.hapus))
-                },
+                text = { Text(text = stringResource(id = R.string.hapus)) },
                 onClick = {
                     expanded = false
                     delete()
                 }
             )
         }
-    }
-}
-
-@Composable
-fun CategoryOption(
-    label: String,
-    isSelected: Boolean,
-    modifier: Modifier = Modifier,
-    onClick: () -> Unit
-) {
-    Row(
-        modifier = modifier,
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        RadioButton(
-            selected = isSelected,
-            onClick = onClick
-        )
-        Text(
-            text = label,
-            style = MaterialTheme.typography.bodyLarge,
-            modifier = Modifier.padding(start = 8.dp)
-        )
     }
 }
 
@@ -234,7 +221,6 @@ fun FormCatatan(
             .padding(16.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
-        // Membuat TextField untuk Judul
         OutlinedTextField(
             value = title,
             onValueChange = onTitleChange,
@@ -246,12 +232,11 @@ fun FormCatatan(
             ),
             modifier = Modifier.fillMaxWidth()
         )
-        // Membuat Berat dan Satuan dalam satu baris
+
         Row(
             horizontalArrangement = Arrangement.spacedBy(8.dp),
             modifier = Modifier.fillMaxWidth()
         ) {
-            // Membuat TextField untuk Berat
             OutlinedTextField(
                 value = berat,
                 onValueChange = onBeratChange,
@@ -262,7 +247,6 @@ fun FormCatatan(
                 ),
                 modifier = Modifier.weight(1f)
             )
-            // Membuat Dropdown untuk Satuan
             ExposedDropdownMenuBox(
                 expanded = expanded,
                 onExpandedChange = onExpandedChange,
@@ -297,27 +281,30 @@ fun FormCatatan(
             }
         }
 
-        // Radio Button untuk Kategori
         Text(text = stringResource(id = R.string.kategori), style = MaterialTheme.typography.labelLarge)
         Column(
             modifier = Modifier
-                .border(
-                    width = 1.dp,
-                    color = Color.Gray,
-                    shape = RoundedCornerShape(8.dp)
-                )
+                .border(1.dp, Color.Gray, RoundedCornerShape(8.dp))
                 .padding(8.dp),
             verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
             kategoriList.forEach { text ->
-                CategoryOption (
-                    label = text,
-                    isSelected = kategori == text,
+                Row(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(vertical = 4.dp),
-                    onClick = { onKategoriChange(text) }
-                )
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    RadioButton(
+                        selected = kategori == text,
+                        onClick = { onKategoriChange(text) }
+                    )
+                    Text(
+                        text = text,
+                        style = MaterialTheme.typography.bodyLarge,
+                        modifier = Modifier.padding(start = 8.dp)
+                    )
+                }
             }
         }
     }

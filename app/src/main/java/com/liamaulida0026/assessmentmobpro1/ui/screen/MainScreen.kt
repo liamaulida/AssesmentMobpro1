@@ -3,12 +3,7 @@ package com.liamaulida0026.assessmentmobpro1.ui.screen
 import android.content.res.Configuration
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.staggeredgrid.LazyVerticalStaggeredGrid
@@ -16,22 +11,9 @@ import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridCells
 import androidx.compose.foundation.lazy.staggeredgrid.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.DividerDefaults
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.FloatingActionButton
-import androidx.compose.material3.HorizontalDivider
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.TopAppBarDefaults
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
+import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -50,18 +32,18 @@ import com.liamaulida0026.assessmentmobpro1.navigation.Screen
 import com.liamaulida0026.assessmentmobpro1.ui.theme.AssessmentMobpro1Theme
 import com.liamaulida0026.assessmentmobpro1.util.SettingsDataStore
 import com.liamaulida0026.assessmentmobpro1.util.ViewModelFactory
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MainScreen(navController: NavHostController) {
-    val dataStore = SettingsDataStore(LocalContext.current)
-    val showList by dataStore.layoutFlow.collectAsState(true)
+    val context = LocalContext.current
+    val dataStore = remember { SettingsDataStore(context) }
+    val layoutFlow by dataStore.layoutFlow.collectAsState(initial = true)
+    val scope = rememberCoroutineScope()
+    val snackbarHostState = remember { SnackbarHostState() }
 
-    Scaffold (
+    Scaffold(
         topBar = {
             TopAppBar(
                 title = {
@@ -73,17 +55,17 @@ fun MainScreen(navController: NavHostController) {
                 ),
                 actions = {
                     IconButton(onClick = {
-                        CoroutineScope(Dispatchers.IO).launch {
-                            dataStore.saveLayout(!showList)
+                        scope.launch {
+                            dataStore.saveLayout(!layoutFlow)
                         }
                     }) {
                         Icon(
                             painter = painterResource(
-                                if (showList) R.drawable.baseline_grid_view_24
+                                if (layoutFlow) R.drawable.baseline_grid_view_24
                                 else R.drawable.baseline_view_list_24
                             ),
                             contentDescription = stringResource(
-                                if (showList) R.string.grid
+                                if (layoutFlow) R.string.grid
                                 else R.string.list
                             ),
                             tint = MaterialTheme.colorScheme.primary
@@ -104,9 +86,17 @@ fun MainScreen(navController: NavHostController) {
                     tint = MaterialTheme.colorScheme.primary
                 )
             }
+        },
+        snackbarHost = {
+            SnackbarHost(hostState = snackbarHostState)
         }
     ) { innerPadding ->
-        ScreenContent(showList, Modifier.padding(innerPadding), navController)
+        ScreenContent(
+            showList = layoutFlow,
+            modifier = Modifier.padding(innerPadding),
+            navController = navController,
+            snackbarHostState = snackbarHostState
+        )
     }
 }
 
@@ -114,12 +104,14 @@ fun MainScreen(navController: NavHostController) {
 fun ScreenContent(
     showList: Boolean,
     modifier: Modifier = Modifier,
-    navController: NavHostController
+    navController: NavHostController,
+    snackbarHostState: SnackbarHostState
 ) {
     val context = LocalContext.current
-    val factory = ViewModelFactory(context)
-    val viewModel: MainViewModel = viewModel(factory = factory)
+    val viewModel: MainViewModel = viewModel(factory = ViewModelFactory(context))
+    val detailViewModel: DetailViewModel = viewModel(factory = ViewModelFactory(context))
     val data by viewModel.data.collectAsState()
+    val scope = rememberCoroutineScope()
 
     if (data.isEmpty()) {
         Column(
@@ -131,23 +123,35 @@ fun ScreenContent(
         ) {
             Text(text = stringResource(id = R.string.list_kosong))
         }
-    }
-    else {
+    } else {
         if (showList) {
             LazyColumn(
                 modifier = modifier.fillMaxSize(),
                 contentPadding = PaddingValues(bottom = 84.dp)
             ) {
-                items(data) {
-                    ListItem(catatan = it) {
-                        navController.navigate(Screen.FormUbah.withId(it.id))
-                    }
+                items(data) { catatan ->
+                    ListItem(
+                        catatan = catatan,
+                        onClick = {
+                            navController.navigate(Screen.FormUbah.withId(catatan.id))
+                        },
+                        onDelete = { deletedItem ->
+                            detailViewModel.delete(deletedItem.id)
+                            scope.launch {
+                                val result = snackbarHostState.showSnackbar(
+                                    message = context.getString(R.string.catatan_dihapus),
+                                    actionLabel = context.getString(R.string.undo)
+                                )
+                                if (result == SnackbarResult.ActionPerformed) {
+                                    detailViewModel.restoreDeletedList()
+                                }
+                            }
+                        }
+                    )
                     HorizontalDivider()
                 }
-
             }
-        }
-        else {
+        } else {
             LazyVerticalStaggeredGrid(
                 modifier = modifier.fillMaxSize(),
                 columns = StaggeredGridCells.Fixed(2),
@@ -155,10 +159,26 @@ fun ScreenContent(
                 horizontalArrangement = Arrangement.spacedBy(8.dp),
                 contentPadding = PaddingValues(8.dp, 8.dp, 8.dp, 84.dp)
             ) {
-                items(data) {
-                    GridItem(catatan = it) {
-                        navController.navigate(Screen.FormUbah.withId(it.id))
-                    }
+                items(data) { catatan ->
+                    GridItem(
+                        catatan = catatan,
+                        onClick = {
+                            navController.navigate(Screen.FormUbah.withId(catatan.id))
+                        },
+                        onDelete = { deletedItem ->
+                            detailViewModel.delete(deletedItem.id)
+                            scope.launch {
+                                val result = snackbarHostState.showSnackbar(
+                                    message = context.getString(R.string.catatan_dihapus),
+                                    actionLabel = context.getString(R.string.undo),
+                                    
+                                )
+                                if (result == SnackbarResult.ActionPerformed) {
+                                    detailViewModel.restoreDeletedList()
+                                }
+                            }
+                        }
+                    )
                 }
             }
         }
@@ -166,7 +186,7 @@ fun ScreenContent(
 }
 
 @Composable
-fun ListItem(catatan: Catatan, onClick: () -> Unit) {
+fun ListItem(catatan: Catatan, onClick: () -> Unit, onDelete: (Catatan) -> Unit) {
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -186,21 +206,29 @@ fun ListItem(catatan: Catatan, onClick: () -> Unit) {
             overflow = TextOverflow.Ellipsis
         )
         Text(text = catatan.kategori)
+        IconButton(onClick = { onDelete(catatan) }) {
+            Icon(
+                imageVector = Icons.Default.Delete,
+                contentDescription = stringResource(id = R.string.hapus)
+            )
+        }
     }
 }
 
 @Composable
-fun GridItem(catatan: Catatan, onClick: () -> Unit) {
+fun GridItem(catatan: Catatan, onClick: () -> Unit, onDelete: (Catatan) -> Unit) {
     Card(
-        modifier = Modifier.fillMaxWidth().clickable { onClick() },
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable { onClick() },
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.surface
         ),
         border = BorderStroke(1.dp, DividerDefaults.color)
-    ){
+    ) {
         Column(
             modifier = Modifier.padding(8.dp),
-            verticalArrangement = Arrangement.spacedBy(8.dp),
+            verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
             Text(
                 text = catatan.judul,
@@ -214,6 +242,12 @@ fun GridItem(catatan: Catatan, onClick: () -> Unit) {
                 overflow = TextOverflow.Ellipsis
             )
             Text(text = catatan.kategori)
+            IconButton(onClick = { onDelete(catatan) }) {
+                Icon(
+                    imageVector = Icons.Default.Delete,
+                    contentDescription = stringResource(id = R.string.hapus)
+                )
+            }
         }
     }
 }
