@@ -2,6 +2,7 @@ package com.liamaulida0026.assessmentmobpro1.ui.screen
 
 import android.content.res.Configuration
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -208,31 +209,59 @@ fun ScreenContent(
     }
 }
 
-
 @Composable
-fun ListItem(catatan: Catatan, onClick: () -> Unit,  onDelete: (Catatan) -> Unit) {
+fun ListItem(catatan: Catatan, onClick: () -> Unit, onDelete: (Catatan) -> Unit) {
     Column(
         modifier = Modifier
             .fillMaxWidth()
+            .background(MaterialTheme.colorScheme.primary)
             .clickable { onClick() }
-            .padding(16.dp),
+            .padding(horizontal = 8.dp, vertical = 4.dp),
         verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
         Text(
             text = catatan.judul,
+            modifier = Modifier.padding(horizontal = 4.dp),
             maxLines = 1,
             overflow = TextOverflow.Ellipsis,
-            fontWeight = FontWeight.Bold
+            fontWeight = FontWeight.Bold,
+            color = MaterialTheme.colorScheme.onPrimary
         )
         Text(
             text = catatan.berat.toString() + " " + catatan.satuan,
-            maxLines = 2,
-            overflow = TextOverflow.Ellipsis
+            modifier = Modifier.padding(horizontal = 4.dp),
+            overflow = TextOverflow.Ellipsis,
+            color = MaterialTheme.colorScheme.onPrimary
         )
-        IconButton(onClick = { onDelete(catatan) }) {
-            Icon(Icons.Default.Delete, contentDescription = "Hapus")
+        Text(
+            text = catatan.kategori,
+            modifier = Modifier.padding(horizontal = 4.dp),
+            color = MaterialTheme.colorScheme.onPrimary
+        )
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.End
+        ) {
+            IconButton(
+                onClick = { onDelete(catatan) },
+                modifier = Modifier
+                    .size(32.dp)
+                    .padding(start = 4.dp)
+            ) {
+                Icon(
+                    Icons.Default.Delete,
+                    contentDescription = "Hapus",
+                    tint = MaterialTheme.colorScheme.onPrimary,
+                    modifier = Modifier.size(24.dp)
+                )
+            }
         }
     }
+
+    HorizontalDivider(
+        color = MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.3f),
+        thickness = 1.dp
+    )
 }
 
 @Composable
@@ -253,15 +282,20 @@ fun GridItem(catatan: Catatan, onClick: () -> Unit,  onDelete: (Catatan) -> Unit
             Text(
                 text = catatan.judul,
                 maxLines = 1,
+                modifier = Modifier.padding(horizontal = 4.dp),
                 overflow = TextOverflow.Ellipsis,
                 fontWeight = FontWeight.Bold
             )
             Text(
                 text = catatan.berat.toString() + " " + catatan.satuan,
-                maxLines = 2,
+                modifier = Modifier.padding(horizontal = 4.dp),
                 overflow = TextOverflow.Ellipsis
             )
-            Text(text = catatan.kategori)
+            Text(
+                text = catatan.kategori,
+                modifier = Modifier.padding(horizontal = 4.dp)
+            )
+
 
             Row(
                 modifier = Modifier.fillMaxWidth(),
