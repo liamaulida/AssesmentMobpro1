@@ -55,9 +55,7 @@ fun MainScreen(navController: NavHostController) {
                 ),
                 actions = {
                     IconButton(onClick = {
-                        scope.launch {
-                            dataStore.saveLayout(!layoutFlow)
-                        }
+                        scope.launch { dataStore.saveLayout(!layoutFlow) }
                     }) {
                         Icon(
                             painter = painterResource(
@@ -65,9 +63,18 @@ fun MainScreen(navController: NavHostController) {
                                 else R.drawable.baseline_view_list_24
                             ),
                             contentDescription = stringResource(
-                                if (layoutFlow) R.string.grid
-                                else R.string.list
+                                if (layoutFlow) R.string.grid else R.string.list
                             ),
+                            tint = MaterialTheme.colorScheme.primary
+                        )
+                    }
+
+                    IconButton(onClick = {
+                        navController.navigate(Screen.Sampah.route)
+                    }) {
+                        Icon(
+                            painter = painterResource(R.drawable.baseline_restore_from_trash_24),
+                            contentDescription = stringResource(R.string.tempat_sampah),
                             tint = MaterialTheme.colorScheme.primary
                         )
                     }
@@ -87,9 +94,7 @@ fun MainScreen(navController: NavHostController) {
                 )
             }
         },
-        snackbarHost = {
-            SnackbarHost(hostState = snackbarHostState)
-        }
+        snackbarHost = { SnackbarHost(snackbarHostState) }
     ) { innerPadding ->
         ScreenContent(
             showList = layoutFlow,
@@ -112,6 +117,45 @@ fun ScreenContent(
     val detailViewModel: DetailViewModel = viewModel(factory = ViewModelFactory(context))
     val data by viewModel.data.collectAsState()
     val scope = rememberCoroutineScope()
+    val openDialog = remember { mutableStateOf(false) }
+    val selectedCatatan = remember { mutableStateOf<Catatan?>(null) }
+
+    if (openDialog.value) {
+        AlertDialog(
+            onDismissRequest = { openDialog.value = false },
+            title = { Text(stringResource(R.string.pesan_hapus)) },
+            text = { Text(stringResource(R.string.hapus_list)) },
+            confirmButton = {
+                TextButton(onClick = {
+                    selectedCatatan.value?.let { catatan ->
+                        detailViewModel.recentlyDeletedList = catatan
+                        detailViewModel.delete(catatan.id)
+                        scope.launch {
+                            val result = snackbarHostState.showSnackbar(
+                                message = context.getString(R.string.catatan_dihapus),
+                                actionLabel = context.getString(R.string.undo),
+                                duration = SnackbarDuration.Short,
+                                )
+                            if (result == SnackbarResult.ActionPerformed) {
+                                detailViewModel.restoreDeletedCatatan()
+                            }
+                        }
+                    }
+
+                    openDialog.value = false
+                }) {
+                    Text(stringResource(android.R.string.ok))
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = {
+                    openDialog.value = false
+                }) {
+                    Text(stringResource(android.R.string.cancel))
+                }
+            }
+        )
+    }
 
     if (data.isEmpty()) {
         Column(
@@ -132,20 +176,10 @@ fun ScreenContent(
                 items(data) { catatan ->
                     ListItem(
                         catatan = catatan,
-                        onClick = {
-                            navController.navigate(Screen.FormUbah.withId(catatan.id))
-                        },
-                        onDelete = { deletedItem ->
-                            detailViewModel.delete(deletedItem.id)
-                            scope.launch {
-                                val result = snackbarHostState.showSnackbar(
-                                    message = context.getString(R.string.catatan_dihapus),
-                                    actionLabel = context.getString(R.string.undo)
-                                )
-                                if (result == SnackbarResult.ActionPerformed) {
-                                    detailViewModel.restoreDeletedList()
-                                }
-                            }
+                        onClick = { navController.navigate(Screen.FormUbah.withId(catatan.id)) },
+                        onDelete = {
+                            selectedCatatan.value = it
+                            openDialog.value = true
                         }
                     )
                     HorizontalDivider()
@@ -162,21 +196,10 @@ fun ScreenContent(
                 items(data) { catatan ->
                     GridItem(
                         catatan = catatan,
-                        onClick = {
-                            navController.navigate(Screen.FormUbah.withId(catatan.id))
-                        },
-                        onDelete = { deletedItem ->
-                            detailViewModel.delete(deletedItem.id)
-                            scope.launch {
-                                val result = snackbarHostState.showSnackbar(
-                                    message = context.getString(R.string.catatan_dihapus),
-                                    actionLabel = context.getString(R.string.undo),
-                                    
-                                )
-                                if (result == SnackbarResult.ActionPerformed) {
-                                    detailViewModel.restoreDeletedList()
-                                }
-                            }
+                        onClick = { navController.navigate(Screen.FormUbah.withId(catatan.id)) },
+                        onDelete = {
+                            selectedCatatan.value = it
+                            openDialog.value = true
                         }
                     )
                 }
@@ -185,8 +208,9 @@ fun ScreenContent(
     }
 }
 
+
 @Composable
-fun ListItem(catatan: Catatan, onClick: () -> Unit, onDelete: (Catatan) -> Unit) {
+fun ListItem(catatan: Catatan, onClick: () -> Unit,  onDelete: (Catatan) -> Unit) {
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -205,24 +229,20 @@ fun ListItem(catatan: Catatan, onClick: () -> Unit, onDelete: (Catatan) -> Unit)
             maxLines = 2,
             overflow = TextOverflow.Ellipsis
         )
-        Text(text = catatan.kategori)
         IconButton(onClick = { onDelete(catatan) }) {
-            Icon(
-                imageVector = Icons.Default.Delete,
-                contentDescription = stringResource(id = R.string.hapus)
-            )
+            Icon(Icons.Default.Delete, contentDescription = "Hapus")
         }
     }
 }
 
 @Composable
-fun GridItem(catatan: Catatan, onClick: () -> Unit, onDelete: (Catatan) -> Unit) {
+fun GridItem(catatan: Catatan, onClick: () -> Unit,  onDelete: (Catatan) -> Unit) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
             .clickable { onClick() },
         colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surface
+            containerColor = MaterialTheme.colorScheme.primary
         ),
         border = BorderStroke(1.dp, DividerDefaults.color)
     ) {
@@ -242,11 +262,14 @@ fun GridItem(catatan: Catatan, onClick: () -> Unit, onDelete: (Catatan) -> Unit)
                 overflow = TextOverflow.Ellipsis
             )
             Text(text = catatan.kategori)
-            IconButton(onClick = { onDelete(catatan) }) {
-                Icon(
-                    imageVector = Icons.Default.Delete,
-                    contentDescription = stringResource(id = R.string.hapus)
-                )
+
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.End
+            ) {
+                IconButton(onClick = { onDelete(catatan) }) {
+                    Icon(Icons.Default.Delete, contentDescription = "Hapus")
+                }
             }
         }
     }

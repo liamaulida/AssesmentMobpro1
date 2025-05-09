@@ -79,17 +79,19 @@ fun DetailScreen(navController: NavHostController, id: Long? = null) {
     var kategori by remember { mutableStateOf(radioOptions[0]) }
     var showDialog by remember { mutableStateOf(false) }
 
-    val coroutineScope = rememberCoroutineScope()
-
     LaunchedEffect(id) {
-        if (id == null) return@LaunchedEffect
-        val data = viewModel.getCatatan(id) ?: return@LaunchedEffect
-        judul = data.judul
-        berat = data.berat.toString()
-        satuan = data.satuan
-        kategori = data.kategori
+        if (id != null) {
+            val data = viewModel.getCatatan(id)
+            data?.let {
+                judul = it.judul
+                berat = it.berat.toString()
+                satuan = it.satuan
+                kategori = it.kategori
+            }
+        }
     }
 
+    val coroutineScope = rememberCoroutineScope()
     Scaffold(
         topBar = {
             TopAppBar(
@@ -142,6 +144,7 @@ fun DetailScreen(navController: NavHostController, id: Long? = null) {
             )
         }
     ) { padding ->
+
         FormCatatan(
             title = judul,
             onTitleChange = { judul = it },
@@ -152,7 +155,7 @@ fun DetailScreen(navController: NavHostController, id: Long? = null) {
             kategori = kategori,
             onKategoriChange = { kategori = it },
             satuanList = satuanList,
-            kategoriList = radioOptions,
+            radioOptions = radioOptions,
             expanded = expanded,
             onExpandedChange = { expanded = it },
             modifier = Modifier.padding(padding)
@@ -162,13 +165,11 @@ fun DetailScreen(navController: NavHostController, id: Long? = null) {
             DisplayAlertDialog(
                 onDismissRequest = { showDialog = false },
                 onConfirmation = {
-                    coroutineScope.launch {
-                        viewModel.getCatatan(id)?.let {
-                            viewModel.delete(it.id)
-                            navController.popBackStack()
-                        }
-                    }
                     showDialog = false
+                    coroutineScope.launch {
+                        viewModel.delete(id)
+                        navController.popBackStack()
+                    }
                 }
             )
         }
@@ -202,6 +203,29 @@ fun DeleteAction(delete: () -> Unit) {
     }
 }
 
+@Composable
+fun CategoryOption(
+    label: String,
+    isSelected: Boolean,
+    modifier: Modifier = Modifier,
+    onClick: () -> Unit
+) {
+    Row(
+        modifier = modifier,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        RadioButton(
+            selected = isSelected,
+            onClick = onClick
+        )
+        Text(
+            text = label,
+            style = MaterialTheme.typography.bodyLarge,
+            modifier = Modifier.padding(start = 8.dp)
+        )
+    }
+}
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun FormCatatan(
@@ -210,7 +234,7 @@ fun FormCatatan(
     satuan: String, onSatuanChange: (String) -> Unit,
     kategori: String, onKategoriChange: (String) -> Unit,
     satuanList: List<String>,
-    kategoriList: List<String>,
+    radioOptions: List<String>,
     expanded: Boolean,
     onExpandedChange: (Boolean) -> Unit,
     modifier: Modifier = Modifier
@@ -288,21 +312,17 @@ fun FormCatatan(
                 .padding(8.dp),
             verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
-            kategoriList.forEach { text ->
+            radioOptions.forEach { text ->
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(vertical = 4.dp),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    RadioButton(
-                        selected = kategori == text,
+                    CategoryOption(
+                        label = text,
+                        isSelected = kategori == text,
                         onClick = { onKategoriChange(text) }
-                    )
-                    Text(
-                        text = text,
-                        style = MaterialTheme.typography.bodyLarge,
-                        modifier = Modifier.padding(start = 8.dp)
                     )
                 }
             }

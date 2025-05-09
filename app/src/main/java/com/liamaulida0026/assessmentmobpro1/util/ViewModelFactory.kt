@@ -6,16 +6,23 @@ import androidx.lifecycle.ViewModelProvider
 import com.liamaulida0026.assessmentmobpro1.database.CatatanDb
 import com.liamaulida0026.assessmentmobpro1.ui.screen.DetailViewModel
 import com.liamaulida0026.assessmentmobpro1.ui.screen.MainViewModel
+import com.liamaulida0026.assessmentmobpro1.ui.screen.RecycleBinViewModel
 
 class ViewModelFactory(private val context: Context) : ViewModelProvider.Factory {
     @Suppress("UNCHECKED_CAST")
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         val dao = CatatanDb.getInstance(context).dao
-        if (modelClass.isAssignableFrom(MainViewModel::class.java)) {
-            return MainViewModel(dao) as T
-        } else if (modelClass.isAssignableFrom(DetailViewModel::class.java)) {
-            return DetailViewModel(dao) as T
+        return when {
+            modelClass.isAssignableFrom(MainViewModel::class.java) -> {
+                MainViewModel(dao) as T
+            }
+            modelClass.isAssignableFrom(DetailViewModel::class.java) -> {
+                DetailViewModel(dao) as T
+            }
+            modelClass.isAssignableFrom(RecycleBinViewModel::class.java) -> {
+                RecycleBinViewModel(dao) as T
+            }
+            else -> throw IllegalArgumentException("Unknown ViewModel class: ${modelClass.name}")
         }
-        throw IllegalArgumentException("Unknown ViewModel class")
     }
 }

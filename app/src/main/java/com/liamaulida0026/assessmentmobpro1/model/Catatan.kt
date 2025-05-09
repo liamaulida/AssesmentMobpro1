@@ -10,5 +10,6 @@ data class Catatan(
     val judul: String,
     val berat: Double,
     val satuan: String,
-    val kategori: String
+    val kategori: String,
+    val isDeleted: Boolean = false
 )

@@ -9,7 +9,7 @@ import kotlinx.coroutines.launch
 
 class DetailViewModel(private val dao: CatatanDao) : ViewModel() {
 
-    private var recentlyDeletedList: Catatan? = null
+    var recentlyDeletedList: Catatan? = null
 
     suspend fun getCatatan(id: Long): Catatan? {
         return dao.getCatatanById(id)
@@ -43,18 +43,17 @@ class DetailViewModel(private val dao: CatatanDao) : ViewModel() {
 
     fun delete(id: Long) {
         viewModelScope.launch(Dispatchers.IO) {
-            val catatan = dao.getCatatanById(id)
-            if (catatan != null) {
-                recentlyDeletedList = catatan
-                dao.deleteById(id)
-            }
+            recentlyDeletedList = dao.getCatatanById(id)
+            dao.moveToRecycleBin(id)
         }
     }
 
-    fun restoreDeletedList() {
+    fun restoreDeletedCatatan() {
         viewModelScope.launch(Dispatchers.IO) {
-            recentlyDeletedList?.let { dao.insert(it) }
-            recentlyDeletedList = null
+            recentlyDeletedList?.let {
+                dao.update(it.copy(isDeleted = false))
+                recentlyDeletedList = null
+            }
         }
     }
 }

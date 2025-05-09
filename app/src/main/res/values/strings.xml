@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Assessment Mobpro 1</string>
+    <string name="app_name">MyGroceryList</string>
     <string name="list_kosong">Belum ada data list belanja</string>
     <string name="tambah_catatan">Tambah List Belanja</string>
     <string name="judul">Nama barang</string>
@@ -15,12 +15,22 @@
     <string name="edit_catatan">Edit Catatan List Belanja</string>
     <string name="invalid">Isi daftar list belanja tidak boleh kosong</string>
     <string name="opsi_lainnya">Opsi Lainnya</string>
-    <string name="hapus">Hapus Catatan</string>
+    <string name="hapus">Hapus list</string>
     <string name="pesan_hapus">Yakin hapus list belanja ini?</string>
+    <string name="hapus_list">Saya yakin hapus list belanja ini</string>
     <string name="tombol_hapus">Hapus</string>
     <string name="tombol_batal">Batal</string>
     <string name="list">Tampilan List</string>
     <string name="grid">Tampilan Grid</string>
     <string name="undo">Undo</string>
     <string name="catatan_dihapus">Catatan List belanja telah dihapus</string>
+    <string name="recycle_bin">Recycle Bin</string>
+    <string name="menu">Menu</string>
+    <string name="tempat_sampah">Tempat Sampah</string>
+    <string name="empty_recycle_bin">Recycle Bin Kosong</string>
+    <string name="empty_recycle_bin_confirmation">Apakah Anda yakin ingin mengosongkan Recycle Bin? Semua data akan dihapus permanen.</string>
+    <string name="kosongkan">Kosongkan</string>
+    <string name="hapus_permanen">Hapus Permanen</string>
+    <string name="hapus_permanen_confirmation">Apakah Anda yakin ingin menghapus catatan ini secara permanen?</string>
+    <string name="restore">Restore</string>
 </resources>
