@@ -21,7 +21,7 @@ class MainViewModel : ViewModel(){
     init {
         retrieveData()
     }
-    private fun retrieveData() {
+    fun retrieveData() {
         viewModelScope.launch(Dispatchers.IO) {
             status.value = BukuApi.ApiStatus.LOADING
             try {
@@ -29,6 +29,7 @@ class MainViewModel : ViewModel(){
                 status.value = BukuApi.ApiStatus.SUCCESS
             } catch (e: Exception) {
                 Log.d("MainViewModel", "Failure: ${e.message}")
+                status.value = BukuApi.ApiStatus.FAILED
             }
         }
     }
