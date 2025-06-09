@@ -31,4 +31,6 @@ object BukuApi {
     fun getBukuUrl(imageId: String): String {
         return "$BASE_URL$imageId.jpg"
     }
+
+    enum class ApiStatus { LOADING, SUCCESS }
 }
