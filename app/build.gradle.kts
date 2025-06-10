@@ -71,6 +71,7 @@ dependencies {
     implementation(libs.googleid)
     implementation(libs.androidx.datastore.preferences)
     implementation(libs.androidx.datastore.core.android)
+    implementation(libs.androidx.storage)
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)

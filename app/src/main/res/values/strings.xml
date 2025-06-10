@@ -7,4 +7,9 @@
     <string name="profil">Profil</string>
     <string name="tutup">Tutup</string>
     <string name="logout">Logout</string>
+    <string name="judul_buku">Judul buku</string>
+    <string name="penulis_buku">Penulis buku</string>
+    <string name="review_buku">Review buku</string>
+    <string name="batal">Batal</string>
+    <string name="simpan">Simpan</string>
 </resources>
