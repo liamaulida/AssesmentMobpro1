@@ -8,6 +8,7 @@ import android.graphics.ImageDecoder
 import android.os.Build
 import android.provider.MediaStore
 import android.util.Log
+import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -86,6 +87,9 @@ fun MainScreen() {
     val dataStore = UserDataStore(context)
     val user by dataStore.userFlow.collectAsState(User())
 
+    val viewModel: MainViewModel = viewModel()
+    val errorMessage by viewModel.errorMessage
+
     var showDialog by remember { mutableStateOf(false) }
     var showBukuDialog by remember { mutableStateOf(false) }
 
@@ -95,15 +99,15 @@ fun MainScreen() {
         if (bitmap != null) showBukuDialog = true
     }
 
-    Scaffold (
+    Scaffold(
         topBar = {
             TopAppBar(
                 title = {
-                    Text(text = stringResource(id = R.string.app_name))
+                    Text(text = stringResource(R.string.app_name))
                 },
                 colors = TopAppBarDefaults.mediumTopAppBarColors(
                     containerColor = MaterialTheme.colorScheme.primaryContainer,
-                    titleContentColor = MaterialTheme.colorScheme.primary,
+                    titleContentColor = MaterialTheme.colorScheme.primary
                 ),
                 actions = {
                     IconButton(onClick = {
@@ -116,7 +120,7 @@ fun MainScreen() {
                         Icon(
                             painter = painterResource(R.drawable.baseline_account_circle_24),
                             contentDescription = stringResource(R.string.profil),
-                            tint = MaterialTheme.colorScheme.secondary
+                            tint = MaterialTheme.colorScheme.primary
                         )
                     }
                 }
@@ -140,33 +144,35 @@ fun MainScreen() {
             }
         }
     ) { innerPadding ->
-        ScreenContent(Modifier.padding(innerPadding))
+        ScreenContent(viewModel, Modifier.padding(innerPadding))
+    }
 
-        if (showDialog) {
-            ProfilDialog(
-                user = user,
-                onDismissRequest = { showDialog = false }
-            ) {
-                CoroutineScope(Dispatchers.IO).launch { signOut(context, dataStore) }
-                showDialog = false
-            }
+    if (showDialog) {
+        ProfilDialog(
+            user = user,
+            onDismissRequest = { showDialog = false }) {
+            CoroutineScope(Dispatchers.IO).launch { signOut(context, dataStore) }
+            showDialog = false
         }
+    }
 
-        if (showBukuDialog) {
-            BukuDialog(
-                bitmap = bitmap,
-                onDismissRequest = { showBukuDialog = false }
-            ) { judul, penulis, review ->
-                Log.d("TAMBAH", "$judul $penulis $review ditambahkan")
-                showBukuDialog = false
-            }
+    if (showBukuDialog) {
+        BukuDialog(
+            bitmap = bitmap,
+            onDismissRequest = { showBukuDialog = false }) { judulBuku, penulisBuku, reviewBuku ->
+            viewModel.saveData(user.email, judulBuku, penulisBuku, reviewBuku, bitmap!!)
+            showBukuDialog = false
         }
+    }
+
+    if (errorMessage != null) {
+        Toast.makeText(context, errorMessage, Toast.LENGTH_LONG).show()
+        viewModel.clearMessage()
     }
 }
 
 @Composable
-fun ScreenContent(modifier: Modifier = Modifier) {
-    val viewModel: MainViewModel = viewModel()
+fun ScreenContent(viewModel: MainViewModel, modifier: Modifier = Modifier) {
     val data by viewModel.data
     val status by viewModel.status.collectAsState()
 
@@ -219,7 +225,7 @@ fun ListItem(buku: Buku) {
                 .data(BukuApi.getBukuUrl(buku.imageId))
                 .crossfade(true)
                 .build(),
-            contentDescription = stringResource(R.string.gambar, buku.judulBuku),
+            contentDescription = stringResource(R.string.gambar, buku.judul, buku.penulis),
             contentScale = ContentScale.Crop,
             placeholder = painterResource(id = R.drawable.loading_img),
             error = painterResource(id = R.drawable.broken_img),
@@ -231,12 +237,17 @@ fun ListItem(buku: Buku) {
                 .padding(4.dp)
         ) {
             Text(
-                text = buku.judulBuku,
+                text = buku.judul,
                 fontWeight = FontWeight.Bold,
                 color = Color.White
             )
             Text(
-                text = buku.penulisBuku,
+                text = buku.penulis,
+                fontSize = 14.sp,
+                color = Color.White
+            )
+            Text(
+                text = buku.review,
                 fontSize = 14.sp,
                 color = Color.White
             )
