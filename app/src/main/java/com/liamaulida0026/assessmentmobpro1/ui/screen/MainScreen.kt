@@ -16,6 +16,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -24,6 +25,7 @@ import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -86,7 +88,7 @@ import kotlinx.coroutines.launch
 fun MainScreen() {
     val context = LocalContext.current
     val dataStore = UserDataStore(context)
-    val user by dataStore.userFlow.collectAsState(User())
+    val user by dataStore.userFlow.collectAsState(initial = User())
 
     val viewModel: MainViewModel = viewModel()
     val errorMessage by viewModel.errorMessage
@@ -130,11 +132,11 @@ fun MainScreen() {
         floatingActionButton = {
             FloatingActionButton(onClick = {
                 val options = CropImageContractOptions(
-                    null, CropImageOptions(
-                        imageSourceIncludeGallery = false,
-                        imageSourceIncludeCamera = true,
+                    null, CropImageOptions().apply {
+                        imageSourceIncludeGallery = false
+                        imageSourceIncludeCamera = true
                         fixAspectRatio = true
-                    )
+                    }
                 )
                 launcher.launch(options)
             }) {
@@ -176,9 +178,21 @@ fun MainScreen() {
 fun ScreenContent(viewModel: MainViewModel, userId: String, modifier: Modifier = Modifier) {
     val data by viewModel.data
     val status by viewModel.status.collectAsState()
+    var showDeleteDialog by remember { mutableStateOf(false) }
+    var selectedBuku by remember { mutableStateOf<Buku?>(null) }
 
     LaunchedEffect(userId) {
         viewModel.retrieveData(userId)
+    }
+
+    if (showDeleteDialog && selectedBuku != null) {
+        DeleteDialog(
+            onDismiss = { showDeleteDialog = false },
+            onConfirm = {
+                viewModel.deleteBuku(selectedBuku!!.id, userId)
+                showDeleteDialog = false
+            }
+        )
     }
 
     when (status) {
@@ -196,7 +210,12 @@ fun ScreenContent(viewModel: MainViewModel, userId: String, modifier: Modifier =
                 modifier = modifier.fillMaxSize().padding(4.dp),
                 columns = GridCells.Fixed(2),
             ) {
-                items(data) { ListItem(buku = it) }
+                items(data) { hewan ->
+                    ListItem(buku = hewan, onDeleteClicked = { selected ->
+                        selectedBuku = selected
+                        showDeleteDialog = true
+                    })
+                }
             }
         }
 
@@ -220,7 +239,7 @@ fun ScreenContent(viewModel: MainViewModel, userId: String, modifier: Modifier =
 }
 
 @Composable
-fun ListItem(buku: Buku) {
+fun ListItem(buku: Buku, onDeleteClicked: (Buku) -> Unit) {
     Box(
         modifier = Modifier.padding(4.dp).border(1.dp, Color.Gray),
         contentAlignment = Alignment.BottomCenter
@@ -230,32 +249,62 @@ fun ListItem(buku: Buku) {
                 .data(BukuApi.getBukuUrl(buku.imageId))
                 .crossfade(true)
                 .build(),
-            contentDescription = stringResource(R.string.gambar, buku.judul_buku, buku.penulis_buku),
+            contentDescription = stringResource(
+                R.string.gambar,
+                buku.judul_buku,
+                buku.penulis_buku,
+                buku.review_buku
+            ),
             contentScale = ContentScale.Crop,
             placeholder = painterResource(id = R.drawable.loading_img),
             error = painterResource(id = R.drawable.broken_img),
             modifier = Modifier.fillMaxWidth().padding(4.dp)
         )
         Column(
-            modifier = Modifier.fillMaxWidth().padding(4.dp)
-                .background(Color(red = 0f, green = 0f, blue = 0f, alpha = 0.5f))
+            modifier = Modifier
+                .fillMaxWidth()
                 .padding(4.dp)
+                .background(Color(red = 0f, green = 0f, blue = 0f, alpha = 0.5f))
         ) {
-            Text(
-                text = buku.judul_buku,
-                fontWeight = FontWeight.Bold,
-                color = Color.White
-            )
-            Text(
-                text = buku.penulis_buku,
-                fontSize = 14.sp,
-                color = Color.White
-            )
-            Text(
-                text = buku.review_buku,
-                fontSize = 14.sp,
-                color = Color.White
-            )
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                Column(
+                    modifier = Modifier
+                        .weight(1f)
+                        .padding(3.dp)
+                ) {
+                    Text(
+                        text = buku.judul_buku,
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 14.sp,
+                        color = Color.White
+                    )
+                    Text(
+                        text = buku.penulis_buku,
+                        fontSize = 12.sp,
+                        color = Color.White
+                    )
+                    Text(
+                        text = buku.review_buku,
+                        fontSize = 12.sp,
+                        color = Color.White
+                    )
+                }
+                Column(
+                    horizontalAlignment = Alignment.End
+                ) {
+                    IconButton(onClick = { onDeleteClicked(buku) }) {
+                        Icon(
+                            imageVector = Icons.Default.Delete,
+                            contentDescription = stringResource(R.string.hapus),
+                            tint = Color.White
+                        )
+                    }
+                }
+            }
         }
     }
 }
@@ -287,10 +336,10 @@ private suspend fun handleSignIn(
     if (credential is CustomCredential && credential.type == GoogleIdTokenCredential.TYPE_GOOGLE_ID_TOKEN_CREDENTIAL) {
         try {
             val googleId = GoogleIdTokenCredential.createFrom(credential.data)
-            val nama = googleId.displayName ?: ""
+            val name = googleId.displayName ?: ""
             val email = googleId.id
             val photoUrl = googleId.profilePictureUri.toString()
-            dataStore.saveData(User(nama, email, photoUrl))
+            dataStore.saveData(User(name, email, photoUrl))
         } catch (e: GoogleIdTokenParsingException) {
             Log.e("SIGN-IN", "Error: ${e.message}")
         }

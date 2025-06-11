@@ -26,7 +26,6 @@ class MainViewModel : ViewModel() {
     var errorMessage = mutableStateOf<String?>(null)
         private set
 
-
     fun retrieveData(userId: String) {
         viewModelScope.launch(Dispatchers.IO) {
             status.value = BukuApi.ApiStatus.LOADING
@@ -58,6 +57,18 @@ class MainViewModel : ViewModel() {
             } catch (e: Exception) {
                 Log.d("MainViewModel", "Failure: ${e.message}")
                 errorMessage.value = "Error: ${e.message}"
+            }
+        }
+    }
+
+    fun deleteBuku(idBuku: String, userId: String) {
+        viewModelScope.launch {
+            try {
+                BukuApi.service.deleteBuku(userId, idBuku)
+                retrieveData(userId)
+            } catch (e: Exception) {
+                Log.d("delete", "$idBuku $userId")
+                errorMessage.value = "Gagal menghapus data"
             }
         }
     }

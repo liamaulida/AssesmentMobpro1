@@ -1,7 +1,7 @@
 <resources>
     <string name="app_name">Assessment Mobpro 1</string>
     <string name="gambar">Gambar %1$s</string>
-    <string name="tambah_buku">Tambah buku</string>
+    <string name="tambah_buku">Tambah Buku</string>
     <string name="error">Gagal Memuat data.. Koneksi sedang error.</string>
     <string name="try_again">Coba lagi</string>
     <string name="profil">Profil</string>
@@ -12,4 +12,7 @@
     <string name="review_buku">Review buku</string>
     <string name="batal">Batal</string>
     <string name="simpan">Simpan</string>
+    <string name="pesan_dialog">Apakah kamu yakin akan menghapus data ini?</string>
+    <string name="dialog_hapus">Konfirmasi Hapus</string>
+    <string name="hapus">Hapus</string>
 </resources>

@@ -33,6 +33,12 @@ interface BukuApiService {
         @Header("Authorization") userId: String
     ): List<Buku>
 
+    @DELETE("buku.php")
+    suspend fun deleteBuku(
+        @Header("Authorization") userId: String,
+        @Query("id") idBuku: String
+    ): OpStatus
+
     @Multipart
     @POST("buku.php")
     suspend fun postBuku(
