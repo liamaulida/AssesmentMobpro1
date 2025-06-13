@@ -41,6 +41,17 @@ interface BukuApiService {
 
     @Multipart
     @POST("buku.php")
+    suspend fun updateBuku(
+        @Header("Authorization") userId: String,
+        @Part("id") id: RequestBody,
+        @Part("judul_buku") judulBuku: RequestBody,
+        @Part("penulis_buku") isiReview: RequestBody,
+        @Part("review_buku") rating: RequestBody,
+        @Part image: MultipartBody.Part?
+    ): OpStatus
+
+    @Multipart
+    @POST("buku.php")
     suspend fun postBuku(
         @Header("Authorization") userId: String,
         @Part("judul_buku") judul: RequestBody,

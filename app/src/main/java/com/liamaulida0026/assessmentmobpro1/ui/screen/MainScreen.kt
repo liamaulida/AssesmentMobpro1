@@ -31,6 +31,7 @@ import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
@@ -99,13 +100,25 @@ fun MainScreen() {
     val viewModel: MainViewModel = viewModel()
     val errorMessage by viewModel.errorMessage
 
+    var showEditDialog by remember { mutableStateOf(false) }
+    var showDeleteDialog by remember { mutableStateOf(false) }
+    var selectedBuku by remember { mutableStateOf<Buku?>(null) }
+
     var showDialog by remember { mutableStateOf(false) }
     var showBukuDialog by remember { mutableStateOf(false) }
 
     var bitmap: Bitmap? by remember { mutableStateOf(null) }
+    var editBitmap: Bitmap? by remember { mutableStateOf(null)}
     val launcher = rememberLauncherForActivityResult(CropImageContract()) {
         bitmap = getCroppedImage(context.contentResolver, it)
         if (bitmap != null) showBukuDialog = true
+    }
+
+    val editLauncher = rememberLauncherForActivityResult(CropImageContract()) {
+        editBitmap = getCroppedImage(context.contentResolver, it)
+        if (editBitmap != null) {
+            showEditDialog = true
+        }
     }
 
     Scaffold(
@@ -153,7 +166,20 @@ fun MainScreen() {
             }
         }
     ) { innerPadding ->
-        ScreenContent(viewModel, user.email, Modifier.padding(innerPadding))
+        ScreenContent(
+            viewModel,
+            user.email,
+            Modifier.padding(innerPadding),
+            onEditClicked = { buku ->
+                selectedBuku = buku
+                editBitmap = null
+                showEditDialog = true
+            },
+            onDeleteClicked = { buku ->
+                selectedBuku = buku
+                showDeleteDialog = true
+            }
+        )
     }
 
     if (showDialog) {
@@ -174,6 +200,51 @@ fun MainScreen() {
         }
     }
 
+    if (showDeleteDialog && selectedBuku != null) {
+        DeleteDialog(
+            onDismiss = { showDeleteDialog = false },
+            onConfirm = {
+                viewModel.deleteBuku(selectedBuku!!.id, user.email)
+                showDeleteDialog = false
+            }
+        )
+    }
+
+    if (showEditDialog && selectedBuku != null) {
+        UpdateDialog(
+            buku = selectedBuku!!,
+            bitmap = editBitmap,
+            onDismissRequest = {
+                showEditDialog = false
+                editBitmap = null
+                selectedBuku = null
+            },
+            onUpdateConfirmed = { id, judul, penulis, review, newBitmap ->
+                viewModel.updateData(
+                    userId = user.email,
+                    id = id,
+                    judul = judul,
+                    penulis = penulis,
+                    review = review,
+                    bitmap = newBitmap
+                )
+                showEditDialog = false
+                editBitmap = null
+                selectedBuku = null
+            },
+            onEditImage = {
+                val options = CropImageContractOptions(
+                    null, CropImageOptions(
+                        imageSourceIncludeGallery = false,
+                        imageSourceIncludeCamera = true,
+                        fixAspectRatio = true
+                    )
+                )
+                editLauncher.launch(options)
+            }
+        )
+    }
+
     if (errorMessage != null) {
         Toast.makeText(context, errorMessage, Toast.LENGTH_LONG).show()
         viewModel.clearMessage()
@@ -181,24 +252,18 @@ fun MainScreen() {
 }
 
 @Composable
-fun ScreenContent(viewModel: MainViewModel, userId: String, modifier: Modifier = Modifier) {
+fun ScreenContent(
+    viewModel: MainViewModel,
+    userId: String,
+    modifier: Modifier = Modifier,
+    onEditClicked: (Buku) -> Unit,
+    onDeleteClicked: (Buku) -> Unit
+) {
     val data by viewModel.data
     val status by viewModel.status.collectAsState()
-    var showDeleteDialog by remember { mutableStateOf(false) }
-    var selectedBuku by remember { mutableStateOf<Buku?>(null) }
 
     LaunchedEffect(userId) {
         viewModel.retrieveData(userId)
-    }
-
-    if (showDeleteDialog && selectedBuku != null) {
-        DeleteDialog(
-            onDismiss = { showDeleteDialog = false },
-            onConfirm = {
-                viewModel.deleteBuku(selectedBuku!!.id, userId)
-                showDeleteDialog = false
-            }
-        )
     }
 
     when (status) {
@@ -218,10 +283,11 @@ fun ScreenContent(viewModel: MainViewModel, userId: String, modifier: Modifier =
                 verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 items(data) { buku ->
-                    ListItem(buku = buku, onDeleteClicked = { selected ->
-                        selectedBuku = selected
-                        showDeleteDialog = true
-                    })
+                    ListItem(
+                        buku = buku,
+                        onEditClicked = onEditClicked,
+                        onDeleteClicked = onDeleteClicked
+                    )
                 }
             }
         }
@@ -248,12 +314,16 @@ fun ScreenContent(viewModel: MainViewModel, userId: String, modifier: Modifier =
 @Composable
 fun ListItem(
     buku: Buku,
+    onEditClicked: ((Buku)) -> Unit,
     onDeleteClicked: (Buku) -> Unit
 ) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
             .padding(horizontal = 8.dp, vertical = 4.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.onPrimary
+        ),
         shape = RoundedCornerShape(12.dp)
     ) {
         Row(
@@ -291,21 +361,20 @@ fun ListItem(
                     Text(
                         text = buku.judul_buku,
                         fontWeight = FontWeight.Bold,
-                        fontSize = 16.sp,
+                        fontSize = 18.sp,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis,
-                        color = MaterialTheme.colorScheme.surface,
                         modifier = Modifier.weight(1f)
                     )
 
                     Row {
                         IconButton(
-                            onClick = { onDeleteClicked(buku) },
+                            onClick = { onEditClicked(buku) },
                             modifier = Modifier.size(24.dp)
                         ) {
                             Icon(
                                 imageVector = Icons.Default.Edit,
-                                contentDescription = "Edit review",
+                                contentDescription = stringResource(R.string.edit),
                                 tint = MaterialTheme.colorScheme.primary,
                                 modifier = Modifier.size(18.dp)
                             )
@@ -317,7 +386,7 @@ fun ListItem(
                         ) {
                             Icon(
                                 imageVector = Icons.Default.Delete,
-                                contentDescription = "Hapus review",
+                                contentDescription = stringResource(R.string.hapus),
                                 tint = MaterialTheme.colorScheme.error,
                                 modifier = Modifier.size(18.dp)
                             )
@@ -330,13 +399,12 @@ fun ListItem(
                     fontSize = 14.sp,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
-                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.8f),
                     modifier = Modifier.padding(top = 2.dp, bottom = 6.dp)
                 )
 
                 Column {
                     Text(
-                        text = "Review: ",
+                        text = stringResource(R.string.review),
                         fontSize = 14.sp,
                         fontWeight = FontWeight.Medium,
                         color = MaterialTheme.colorScheme.primary,
@@ -347,7 +415,6 @@ fun ListItem(
                         fontSize = 14.sp,
                         maxLines = 3,
                         overflow = TextOverflow.Ellipsis,
-                        color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.8f),
                         lineHeight = 18.sp
                     )
                 }

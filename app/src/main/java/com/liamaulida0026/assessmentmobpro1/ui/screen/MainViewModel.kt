@@ -73,6 +73,31 @@ class MainViewModel : ViewModel() {
         }
     }
 
+    fun updateData(userId: String, id: String, judul: String, penulis: String, review: String, bitmap: Bitmap?) {
+        viewModelScope.launch(Dispatchers.IO) {
+            try {
+                val imagePart = bitmap?.toMultipartBody()
+                val result = BukuApi.service.updateBuku(
+                    userId,
+                    id.toRequestBody("text/plain".toMediaTypeOrNull()),
+                    judul.toRequestBody("text/plain".toMediaTypeOrNull()),
+                    penulis.toRequestBody("text/plain".toMediaTypeOrNull()),
+                    review.toRequestBody("text/plain".toMediaTypeOrNull()),
+                    imagePart
+                )
+
+                if (result.status == "success")
+                    retrieveData(userId)
+                else
+                    throw Exception(result.message)
+
+            } catch (e: Exception) {
+                Log.d("MainViewModel", "Failure: ${e.message}")
+                errorMessage.value = "Error: ${e.message}"
+            }
+        }
+    }
+
     private fun Bitmap.toMultipartBody(): MultipartBody.Part {
         val stream = ByteArrayOutputStream()
         compress(Bitmap.CompressFormat.JPEG, 80, stream)
