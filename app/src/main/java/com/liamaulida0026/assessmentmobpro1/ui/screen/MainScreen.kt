@@ -10,23 +10,27 @@ import android.provider.MediaStore
 import android.util.Log
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.grid.GridCells
-import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.Button
+import androidx.compose.material3.Card
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
@@ -46,12 +50,14 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -206,12 +212,13 @@ fun ScreenContent(viewModel: MainViewModel, userId: String, modifier: Modifier =
         }
 
         BukuApi.ApiStatus.SUCCESS -> {
-            LazyVerticalGrid(
+            LazyColumn(
                 modifier = modifier.fillMaxSize().padding(4.dp),
-                columns = GridCells.Fixed(2),
+                contentPadding = PaddingValues(bottom = 80.dp),
+                verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
-                items(data) { hewan ->
-                    ListItem(buku = hewan, onDeleteClicked = { selected ->
+                items(data) { buku ->
+                    ListItem(buku = buku, onDeleteClicked = { selected ->
                         selectedBuku = selected
                         showDeleteDialog = true
                     })
@@ -239,70 +246,110 @@ fun ScreenContent(viewModel: MainViewModel, userId: String, modifier: Modifier =
 }
 
 @Composable
-fun ListItem(buku: Buku, onDeleteClicked: (Buku) -> Unit) {
-    Box(
-        modifier = Modifier.padding(4.dp).border(1.dp, Color.Gray),
-        contentAlignment = Alignment.BottomCenter
+fun ListItem(
+    buku: Buku,
+    onDeleteClicked: (Buku) -> Unit
+) {
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 8.dp, vertical = 4.dp),
+        shape = RoundedCornerShape(12.dp)
     ) {
-        AsyncImage(
-            model = ImageRequest.Builder(LocalContext.current)
-                .data(BukuApi.getBukuUrl(buku.imageId))
-                .crossfade(true)
-                .build(),
-            contentDescription = stringResource(
-                R.string.gambar,
-                buku.judul_buku,
-                buku.penulis_buku,
-                buku.review_buku
-            ),
-            contentScale = ContentScale.Crop,
-            placeholder = painterResource(id = R.drawable.loading_img),
-            error = painterResource(id = R.drawable.broken_img),
-            modifier = Modifier.fillMaxWidth().padding(4.dp)
-        )
-        Column(
+        Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(4.dp)
-                .background(Color(red = 0f, green = 0f, blue = 0f, alpha = 0.5f))
+                .padding(12.dp)
         ) {
-            Row(
+
+            AsyncImage(
+                model = ImageRequest.Builder(LocalContext.current)
+                    .data(BukuApi.getBukuUrl(buku.imageId))
+                    .crossfade(true)
+                    .build(),
+                contentDescription = stringResource(R.string.gambar, buku.judul_buku),
+                contentScale = ContentScale.Crop,
+                placeholder = painterResource(id = R.drawable.loading_img),
+                error = painterResource(id = R.drawable.broken_img),
                 modifier = Modifier
-                    .fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween
+                    .size(80.dp, 120.dp)
+                    .clip(RoundedCornerShape(8.dp))
+                    .border(1.dp, Color.Gray.copy(alpha = 0.3f), RoundedCornerShape(8.dp))
+            )
+
+            Spacer(modifier = Modifier.width(12.dp))
+
+            Column(
+                modifier = Modifier.weight(1f)
             ) {
-                Column(
-                    modifier = Modifier
-                        .weight(1f)
-                        .padding(3.dp)
+
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.Top
                 ) {
                     Text(
                         text = buku.judul_buku,
                         fontWeight = FontWeight.Bold,
-                        fontSize = 14.sp,
-                        color = Color.White
+                        fontSize = 16.sp,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
+                        color = MaterialTheme.colorScheme.surface,
+                        modifier = Modifier.weight(1f)
                     )
+
+                    Row {
+                        IconButton(
+                            onClick = { onDeleteClicked(buku) },
+                            modifier = Modifier.size(24.dp)
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.Edit,
+                                contentDescription = "Edit review",
+                                tint = MaterialTheme.colorScheme.primary,
+                                modifier = Modifier.size(18.dp)
+                            )
+                        }
+
+                        IconButton(
+                            onClick = { onDeleteClicked(buku) },
+                            modifier = Modifier.size(24.dp)
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.Delete,
+                                contentDescription = "Hapus review",
+                                tint = MaterialTheme.colorScheme.error,
+                                modifier = Modifier.size(18.dp)
+                            )
+                        }
+                    }
+                }
+
+                Text(
+                    text = buku.penulis_buku,
+                    fontSize = 14.sp,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.8f),
+                    modifier = Modifier.padding(top = 2.dp, bottom = 6.dp)
+                )
+
+                Column {
                     Text(
-                        text = buku.penulis_buku,
-                        fontSize = 12.sp,
-                        color = Color.White
+                        text = "Review: ",
+                        fontSize = 14.sp,
+                        fontWeight = FontWeight.Medium,
+                        color = MaterialTheme.colorScheme.primary,
+                        modifier = Modifier.padding(bottom = 2.dp)
                     )
                     Text(
                         text = buku.review_buku,
-                        fontSize = 12.sp,
-                        color = Color.White
+                        fontSize = 14.sp,
+                        maxLines = 3,
+                        overflow = TextOverflow.Ellipsis,
+                        color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.8f),
+                        lineHeight = 18.sp
                     )
-                }
-                Column(
-                    horizontalAlignment = Alignment.End
-                ) {
-                    IconButton(onClick = { onDeleteClicked(buku) }) {
-                        Icon(
-                            imageVector = Icons.Default.Delete,
-                            contentDescription = stringResource(R.string.hapus),
-                            tint = Color.White
-                        )
-                    }
                 }
             }
         }
